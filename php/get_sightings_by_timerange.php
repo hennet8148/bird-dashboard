@@ -4,7 +4,6 @@ require_once 'db.php';
 
 $timeRange = $_GET['timerange'] ?? 'last_hour';
 
-// Determine the SQL WHERE clause based on the time range
 switch ($timeRange) {
     case 'last_hour':
         $timeCondition = "timestamp >= NOW() - INTERVAL 1 HOUR";
@@ -22,13 +21,14 @@ switch ($timeRange) {
         $timeCondition = "timestamp >= NOW() - INTERVAL 30 DAY";
         break;
     default:
-        // Default to last hour if unknown
         $timeCondition = "timestamp >= NOW() - INTERVAL 1 HOUR";
-        break;
 }
 
 $stmt = $pdo->prepare("
-    SELECT species_common_name, COUNT(*) as sightings_count, AVG(confidence) as avg_confidence
+    SELECT species_common_name,
+           COUNT(*) as sightings_count,
+           AVG(confidence) as avg_confidence,
+           MAX(confidence) as max_confidence
     FROM sightings
     WHERE $timeCondition
     GROUP BY species_common_name

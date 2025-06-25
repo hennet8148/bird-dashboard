@@ -1,4 +1,30 @@
-function fetchSightingsByTimeRange(timeRange) {
+// Helper to create sortable table headers
+function createSortableHeader(text, key, currentSort, setSort) {
+  const th = document.createElement('th');
+  th.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider', 'cursor-pointer');
+  th.textContent = text;
+
+  // Add sort indicator if sorting by this column
+  if (currentSort.key === key) {
+    const arrow = document.createElement('span');
+    arrow.textContent = currentSort.asc ? ' ▲' : ' ▼';
+    th.appendChild(arrow);
+  }
+
+  th.addEventListener('click', () => {
+    if (currentSort.key === key) {
+      // Toggle asc/desc
+      setSort({ key, asc: !currentSort.asc });
+    } else {
+      // New sort key, ascending
+      setSort({ key, asc: true });
+    }
+  });
+
+  return th;
+}
+
+function fetchSightingsByTimeRange(timeRange, sort) {
   fetch(`php/get_sightings_by_timerange.php?timerange=${timeRange}`)
     .then(res => res.json())
     .then(data => {
@@ -10,19 +36,36 @@ function fetchSightingsByTimeRange(timeRange) {
         return;
       }
 
+      // Apply sorting client-side for now
+      if (sort && sort.key) {
+        data.sort((a, b) => {
+          if (a[sort.key] < b[sort.key]) return sort.asc ? -1 : 1;
+          if (a[sort.key] > b[sort.key]) return sort.asc ? 1 : -1;
+          return 0;
+        });
+      }
+
       const table = document.createElement('table');
       table.classList.add('min-w-full', 'divide-y', 'divide-gray-200');
 
       // Table header
-      table.innerHTML = `
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Species</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sightings</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Confidence</th>
-          </tr>
-        </thead>
-      `;
+      const thead = document.createElement('thead');
+      thead.classList.add('bg-gray-50');
+      const trHead = document.createElement('tr');
+
+      const currentSort = fetchSightingsByTimeRange.currentSort || { key: 'sightings_count', asc: false };
+      const setSort = (newSort) => {
+        fetchSightingsByTimeRange.currentSort = newSort;
+        fetchSightingsByTimeRange(timeRange, newSort);
+      };
+
+      trHead.appendChild(createSortableHeader('Species', 'species_common_name', currentSort, setSort));
+      trHead.appendChild(createSortableHeader('Sightings', 'sightings_count', currentSort, setSort));
+      trHead.appendChild(createSortableHeader('Avg Confidence', 'avg_confidence', currentSort, setSort));
+      trHead.appendChild(createSortableHeader('Max Confidence', 'max_confidence', currentSort, setSort));
+
+      thead.appendChild(trHead);
+      table.appendChild(thead);
 
       const tbody = document.createElement('tbody');
       tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
@@ -33,6 +76,7 @@ function fetchSightingsByTimeRange(timeRange) {
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${row.species_common_name}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.sightings_count}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.avg_confidence).toFixed(2)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.max_confidence).toFixed(2)}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -56,8 +100,11 @@ document.addEventListener('DOMContentLoaded', () => {
       fetchSightingsByTimeRange(e.target.value);
     });
 
+    // Set default sort
+    fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
+
     // Load default time range data on page load
-    fetchSightingsByTimeRange(timeRangeSelect.value);
+    fetchSightingsByTimeRange(timeRangeSelect.value, fetchSightingsByTimeRange.currentSort);
   }
 });
 
