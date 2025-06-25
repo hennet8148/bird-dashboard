@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
       statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
     });
 
-  // Confidence slider logic
+  // Confidence slider logic for Unique Species
   const confSlider = document.getElementById('confSlider');
   const confValue = document.getElementById('confValue');
 
@@ -44,4 +44,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial fetch on load
     fetchUniqueSpecies(confSlider.value);
   }
+
+  // Confidence slider logic for Yesterday
+  const confSliderYesterday = document.getElementById('confSliderYesterday');
+  const confValueYesterday = document.getElementById('confValueYesterday');
+
+  function fetchYesterdaySpecies(conf) {
+    fetch(`php/get_yesterday_species.php?conf=${conf}`)
+      .then(r => r.json())
+      .then(data => {
+        statYesterday.textContent = data.count ?? '—';
+      })
+      .catch(() => {
+        statYesterday.textContent = '—';
+      });
+  }
+
+  if (confSliderYesterday && confValueYesterday) {
+    confSliderYesterday.addEventListener('input', (e) => {
+      const val = e.target.value;
+      confValueYesterday.textContent = parseFloat(val).toFixed(2);
+      fetchYesterdaySpecies(val);
+    });
+
+    // Initial fetch on load
+    fetchYesterdaySpecies(confSliderYesterday.value);
+  }
 });
+
