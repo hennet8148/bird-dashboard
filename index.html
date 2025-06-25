@@ -51,6 +51,18 @@
       <div class="bg-white p-4 rounded shadow text-center">
         <p class="text-sm text-gray-500">Unique Species</p>
         <p id="statSpecies" class="text-2xl font-bold">—</p>
+        <!-- Confidence Slider UI -->
+        <label for="confSlider" class="block text-sm font-medium mt-2 text-gray-700">Confidence Threshold</label>
+        <input
+          type="range"
+          id="confSlider"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.3"
+          class="w-full mt-1"
+        />
+        <span id="confValue" class="text-sm text-gray-600">0.30</span>
       </div>
       <div class="bg-white p-4 rounded shadow text-center">
         <p class="text-sm text-gray-500">Yesterday: &gt;0.5</p>
@@ -69,30 +81,56 @@
 
   <!-- Placeholder for dynamic scripting -->
   <script>
-    // JS will go here to load stats from stats.php and populate the dashboard
+    // Populate bird dropdown
+    document.addEventListener('DOMContentLoaded', () => {
+      const birdSelect = document.getElementById('birdSelect');
+
+      fetch('php/species_list.php')
+        .then(response => response.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            data.forEach(species => {
+              const option = document.createElement('option');
+              option.value = species;
+              option.textContent = species;
+              birdSelect.appendChild(option);
+            });
+          } else {
+            console.error('Unexpected response:', data);
+          }
+        })
+        .catch(error => console.error('Error fetching species list:', error));
+    });
   </script>
+  <script src="js/stats.js"></script>
+
+  <!-- Confidence slider JS -->
   <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const birdSelect = document.getElementById('birdSelect');
+    document.addEventListener('DOMContentLoaded', () => {
+      const statSpecies = document.getElementById('statSpecies');
+      const confSlider = document.getElementById('confSlider');
+      const confValue = document.getElementById('confValue');
 
-  fetch('php/species_list.php')
-    .then(response => response.json())
-    .then(data => {
-      if (Array.isArray(data)) {
-        data.forEach(species => {
-          const option = document.createElement('option');
-          option.value = species;
-          option.textContent = species;
-          birdSelect.appendChild(option);
-        });
-      } else {
-        console.error('Unexpected response:', data);
+      function fetchUniqueSpecies(conf) {
+        fetch(`php/get_unique_species.php?conf=${conf}`)
+          .then(r => r.json())
+          .then(data => {
+            statSpecies.textContent = data.count ?? '—';
+          })
+          .catch(() => {
+            statSpecies.textContent = '—';
+          });
       }
-    })
-    .catch(error => console.error('Error fetching species list:', error));
-});
-</script>
-<script src="js/stats.js"></script>
-</body>
 
+      confSlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        confValue.textContent = parseFloat(val).toFixed(2);
+        fetchUniqueSpecies(val);
+      });
+
+      // Initial fetch
+      fetchUniqueSpecies(confSlider.value);
+    });
+  </script>
+</body>
 </html>
