@@ -107,4 +107,84 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchSightingsByTimeRange(timeRangeSelect.value, fetchSightingsByTimeRange.currentSort);
   }
 });
+// ... your existing code ...
+
+// Add this new function to fetch sightings for a selected bird and time range
+function fetchSightingsByBird(bird, timeRange) {
+  const container = document.getElementById('dataExplorerContent');
+  if (!bird) {
+    container.innerHTML = '<p>Please select a bird to see data.</p>';
+    return;
+  }
+
+  fetch(`php/get_sightings_by_bird.php?bird=${encodeURIComponent(bird)}&timerange=${timeRange}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.length) {
+        container.innerHTML = '<p>No sightings found for this bird and time range.</p>';
+        return;
+      }
+
+      const table = document.createElement('table');
+      table.classList.add('min-w-full', 'divide-y', 'divide-gray-200');
+
+      table.innerHTML = `
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
+          </tr>
+        </thead>
+      `;
+
+      const tbody = document.createElement('tbody');
+      tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.timestamp}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.confidence).toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      container.innerHTML = ''; // Clear old content
+      container.appendChild(table);
+    })
+    .catch(err => {
+      console.error('Error fetching bird sightings:', err);
+      container.innerHTML = '<p>Failed to load bird data.</p>';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const birdSelect = document.getElementById('birdSelect');
+  const timeRangeSelect = document.getElementById('timeRange');
+  const dataExplorer = document.getElementById('dataExplorerContent');
+
+  if (birdSelect && timeRangeSelect && dataExplorer) {
+    function updateDataExplorer() {
+      const selectedBird = birdSelect.value;
+      const selectedTime = timeRangeSelect.value;
+
+      if (selectedBird) {
+        fetchSightingsByBird(selectedBird, selectedTime);
+      } else {
+        // If no bird selected, fallback to time range summary table
+        fetchSightingsByTimeRange(selectedTime, fetchSightingsByTimeRange.currentSort);
+      }
+    }
+
+    birdSelect.addEventListener('change', updateDataExplorer);
+    timeRangeSelect.addEventListener('change', updateDataExplorer);
+
+    // Set default sort for summary table
+    fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
+
+    // Initial load: show summary or bird data depending on bird selection
+    updateDataExplorer();
+  }
+});
 
