@@ -2,13 +2,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggleButton = document.getElementById('toggleSpeciesList');
   const listContainer = document.getElementById('speciesListContainer');
   const listElement = document.getElementById('speciesList');
+  const confSlider = document.getElementById('confSlider');
+  const confValue = document.getElementById('confValue');
 
-  if (!toggleButton || !listContainer || !listElement) {
+  if (!toggleButton || !listContainer || !listElement || !confSlider || !confValue) {
     console.error('Toggle list: Required elements not found.');
     return;
   }
-
-  console.log('Species list toggle script loaded');
 
   let listVisible = false;
 
@@ -22,18 +22,31 @@ document.addEventListener('DOMContentLoaded', () => {
     listContainer.classList.toggle('opacity-100', listVisible);
   });
 
-  // Sample species for testing
-  const species = [
-    'American Robin', 'Blue Jay', 'Chipping Sparrow', 'Common Grackle',
-    'Eastern Phoebe', 'Eastern Towhee', 'Gray Catbird', 'House Finch',
-    'Mourning Dove', 'Red-eyed Vireo', 'Song Sparrow', 'Tufted Titmouse',
-    'White-breasted Nuthatch', 'Wood Thrush'
-  ];
+  const updateSpeciesList = (confidence) => {
+    fetch(`php/get_species_by_confidence.php?threshold=${confidence}`)
+      .then(res => res.json())
+      .then(data => {
+        listElement.innerHTML = '';
+        data.sort().forEach(name => {
+          const li = document.createElement('li');
+          li.textContent = name;
+          listElement.appendChild(li);
+        });
+        document.getElementById('statSpecies').textContent = data.length;
+      })
+      .catch(err => {
+        console.error('Error fetching species list:', err);
+      });
+  };
 
-  listElement.innerHTML = '';
-  species.sort().forEach(name => {
-    const li = document.createElement('li');
-    li.textContent = name;
-    listElement.appendChild(li);
+  // Initial population
+  updateSpeciesList(parseFloat(confSlider.value));
+
+  // Slider updates
+  confSlider.addEventListener('input', () => {
+    const val = parseFloat(confSlider.value);
+    confValue.textContent = val.toFixed(2);
+    updateSpeciesList(val);
   });
 });
+
