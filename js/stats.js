@@ -8,18 +8,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const confSliderYesterday = document.getElementById('confSliderYesterday');
   const confValueYesterday = document.getElementById('confValueYesterday');
 
-  // Get saved values or default to 0.5
-  const savedConf = localStorage.getItem('confSlider');
-  const initialConf = savedConf !== null && !isNaN(parseFloat(savedConf)) ? parseFloat(savedConf) : 0.5;
+  // Clear saved values on initial load for fresh defaults
+  localStorage.removeItem('confSlider');
+  localStorage.removeItem('confSliderYesterday');
+
+  // Default both sliders to 0.5
+  const initialConf = 0.5;
+  const initialConfYesterday = 0.5;
   confSlider.value = initialConf;
   confValue.textContent = initialConf.toFixed(2);
-
-  const savedConfYesterday = localStorage.getItem('confSliderYesterday');
-  const initialConfYesterday = savedConfYesterday !== null && !isNaN(parseFloat(savedConfYesterday)) ? parseFloat(savedConfYesterday) : 0.5;
   confSliderYesterday.value = initialConfYesterday;
   confValueYesterday.textContent = initialConfYesterday.toFixed(2);
 
-  // Fetch updated data based on saved confidence levels
+  // Fetch updated data
   function fetchStats() {
     fetch('php/stats.php')
       .then(response => response.json())
