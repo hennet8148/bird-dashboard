@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     listContainer.classList.toggle('max-h-0', !listVisible);
     listContainer.classList.toggle('opacity-0', !listVisible);
-    listContainer.classList.toggle('max-h-96', listVisible);
+    listContainer.classList.toggle('max-h-[600px]', listVisible); // More room
+    listContainer.classList.toggle('overflow-y-auto', listVisible); // Scroll if needed
     listContainer.classList.toggle('opacity-100', listVisible);
   });
 
