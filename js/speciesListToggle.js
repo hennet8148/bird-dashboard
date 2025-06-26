@@ -5,17 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let listVisible = false;
 
-  toggleButton.addEventListener('click', () => {
-    listVisible = !listVisible;
-    toggleButton.textContent = listVisible ? 'Hide List ▲' : 'Show List ▼';
-
-    listContainer.classList.toggle('max-h-0', !listVisible);
-    listContainer.classList.toggle('opacity-0', !listVisible);
-    listContainer.classList.toggle('max-h-96', listVisible);
-    listContainer.classList.toggle('opacity-100', listVisible);
-  });
-
-  // Sample species data (replace with live fetch or shared array if needed)
+  // Sample species list — you can replace this later with dynamic content
   const species = [
     'American Robin',
     'Black-capped Chickadee',
@@ -38,12 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
     'American Goldfinch'
   ];
 
-  // Populate the list
+  // Populate species list
   listElement.innerHTML = '';
   species.sort().forEach(bird => {
     const li = document.createElement('li');
     li.textContent = bird;
     listElement.appendChild(li);
   });
-});
 
+  // Toggle behavior
+  toggleButton.addEventListener('click', () => {
