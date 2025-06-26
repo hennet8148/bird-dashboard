@@ -57,12 +57,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Restore confidence values from localStorage or default to 0.5
-  const initialConf = parseFloat(localStorage.getItem('confSlider')) || 0.5;
+  const savedConf = localStorage.getItem('confSlider');
+  const initialConf = savedConf !== null && !isNaN(parseFloat(savedConf)) ? parseFloat(savedConf) : 0.5;
   confSlider.value = initialConf;
   confValue.textContent = initialConf.toFixed(2);
   updateSpeciesList(initialConf);
 
-  const initialConfYesterday = parseFloat(localStorage.getItem('confSliderYesterday')) || 0.5;
+  const savedConfYesterday = localStorage.getItem('confSliderYesterday');
+  const initialConfYesterday = savedConfYesterday !== null && !isNaN(parseFloat(savedConfYesterday)) ? parseFloat(savedConfYesterday) : 0.5;
   confSliderYesterday.value = initialConfYesterday;
   confValueYesterday.textContent = initialConfYesterday.toFixed(2);
   updateYesterdaySpeciesList(initialConfYesterday);
