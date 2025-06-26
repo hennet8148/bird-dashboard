@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Set initial confidence display on page load
+  confValue.textContent = parseFloat(confSlider.value).toFixed(2);
+
   let listVisible = false;
 
   toggleButton.addEventListener('click', () => {
@@ -18,8 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     listContainer.classList.toggle('max-h-0', !listVisible);
     listContainer.classList.toggle('opacity-0', !listVisible);
-    listContainer.classList.toggle('max-h-[600px]', listVisible); // More room
-    listContainer.classList.toggle('overflow-y-auto', listVisible); // Scroll if needed
+    listContainer.classList.toggle('max-h-[600px]', listVisible); // Expanded height
+    listContainer.classList.toggle('overflow-y-auto', listVisible); // Scrollable
     listContainer.classList.toggle('opacity-100', listVisible);
   });
 
@@ -40,10 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   };
 
-  // Initial population
+  // Initial list population based on slider default
   updateSpeciesList(parseFloat(confSlider.value));
 
-  // Slider updates
+  // Slider listener
   confSlider.addEventListener('input', () => {
     const val = parseFloat(confSlider.value);
     confValue.textContent = val.toFixed(2);
