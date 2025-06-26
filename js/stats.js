@@ -3,25 +3,42 @@ document.addEventListener('DOMContentLoaded', () => {
   const statSpecies = document.getElementById('statSpecies');
   const statYesterday = document.getElementById('statYesterday');
 
-  fetch('php/stats.php')
-    .then(response => response.json())
-    .then(data => {
-      if (data) {
-        statSightings.textContent = data.total_sightings ?? '—';
-        statSpecies.textContent = data.total_species ?? '—';
-        statYesterday.textContent = data.yesterday_species?.['0.5'] ?? '—';
-      } else {
-        statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
-      }
-    })
-    .catch(err => {
-      console.error('Failed to fetch stats:', err);
-      statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
-    });
-
-  // Confidence slider logic for Unique Species
   const confSlider = document.getElementById('confSlider');
   const confValue = document.getElementById('confValue');
+  const confSliderYesterday = document.getElementById('confSliderYesterday');
+  const confValueYesterday = document.getElementById('confValueYesterday');
+
+  // Get saved values or default to 0.5
+  const savedConf = localStorage.getItem('confSlider');
+  const initialConf = savedConf !== null && !isNaN(parseFloat(savedConf)) ? parseFloat(savedConf) : 0.5;
+  confSlider.value = initialConf;
+  confValue.textContent = initialConf.toFixed(2);
+
+  const savedConfYesterday = localStorage.getItem('confSliderYesterday');
+  const initialConfYesterday = savedConfYesterday !== null && !isNaN(parseFloat(savedConfYesterday)) ? parseFloat(savedConfYesterday) : 0.5;
+  confSliderYesterday.value = initialConfYesterday;
+  confValueYesterday.textContent = initialConfYesterday.toFixed(2);
+
+  // Fetch updated data based on saved confidence levels
+  function fetchStats() {
+    fetch('php/stats.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data) {
+          statSightings.textContent = data.total_sightings ?? '—';
+          statSpecies.textContent = data.total_species ?? '—';
+          statYesterday.textContent = data.yesterday_species?.[initialConfYesterday.toFixed(2)] ?? '—';
+        } else {
+          statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch stats:', err);
+        statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
+      });
+  }
+
+  fetchStats();
 
   function fetchUniqueSpecies(conf) {
     fetch(`php/get_unique_species.php?conf=${conf}`)
@@ -34,21 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  if (confSlider && confValue) {
-    confSlider.addEventListener('input', (e) => {
-      const val = e.target.value;
-      confValue.textContent = parseFloat(val).toFixed(2);
-      fetchUniqueSpecies(val);
-    });
-
-    // Initial fetch on load
-    fetchUniqueSpecies(confSlider.value);
-  }
-
-  // Confidence slider logic for Yesterday
-  const confSliderYesterday = document.getElementById('confSliderYesterday');
-  const confValueYesterday = document.getElementById('confValueYesterday');
-
   function fetchYesterdaySpecies(conf) {
     fetch(`php/get_yesterday_species.php?conf=${conf}`)
       .then(r => r.json())
@@ -60,15 +62,24 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
+  if (confSlider && confValue) {
+    confSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      confValue.textContent = val.toFixed(2);
+      localStorage.setItem('confSlider', val);
+      fetchUniqueSpecies(val);
+    });
+    fetchUniqueSpecies(initialConf);
+  }
+
   if (confSliderYesterday && confValueYesterday) {
     confSliderYesterday.addEventListener('input', (e) => {
-      const val = e.target.value;
-      confValueYesterday.textContent = parseFloat(val).toFixed(2);
+      const val = parseFloat(e.target.value);
+      confValueYesterday.textContent = val.toFixed(2);
+      localStorage.setItem('confSliderYesterday', val);
       fetchYesterdaySpecies(val);
     });
-
-    // Initial fetch on load
-    fetchYesterdaySpecies(confSliderYesterday.value);
+    fetchYesterdaySpecies(initialConfYesterday);
   }
 });
 
