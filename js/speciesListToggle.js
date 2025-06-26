@@ -61,13 +61,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const initialConf = savedConf !== null && !isNaN(parseFloat(savedConf)) ? parseFloat(savedConf) : 0.5;
   confSlider.value = initialConf;
   confValue.textContent = initialConf.toFixed(2);
-  updateSpeciesList(initialConf);
 
   const savedConfYesterday = localStorage.getItem('confSliderYesterday');
   const initialConfYesterday = savedConfYesterday !== null && !isNaN(parseFloat(savedConfYesterday)) ? parseFloat(savedConfYesterday) : 0.5;
   confSliderYesterday.value = initialConfYesterday;
   confValueYesterday.textContent = initialConfYesterday.toFixed(2);
-  updateYesterdaySpeciesList(initialConfYesterday);
+
+  // Delayed calls to avoid clobbering by stats.js
+  setTimeout(() => {
+    updateSpeciesList(initialConf);
+    updateYesterdaySpeciesList(initialConfYesterday);
+  }, 100);
 
   // Toggle list visibility
   let listVisible = false;
