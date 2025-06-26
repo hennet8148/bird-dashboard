@@ -1,4 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Yesterday elements (working reference)
+  const toggleButtonYesterday = document.getElementById('toggleSpeciesListYesterday');
+  const listContainerYesterday = document.getElementById('speciesListContainerYesterday');
+  const listElementYesterday = document.getElementById('speciesListYesterday');
+  const confSliderYesterday = document.getElementById('confSliderYesterday');
+  const confValueYesterday = document.getElementById('confValueYesterday');
+  const statYesterday = document.getElementById('statYesterday');
+
   // All-time elements
   const toggleButton = document.getElementById('toggleSpeciesList');
   const listContainer = document.getElementById('speciesListContainer');
@@ -6,14 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const confSlider = document.getElementById('confSlider');
   const confValue = document.getElementById('confValue');
   const statSpecies = document.getElementById('statSpecies');
-
-  // Yesterday elements
-  const toggleButtonYesterday = document.getElementById('toggleSpeciesListYesterday');
-  const listContainerYesterday = document.getElementById('speciesListContainerYesterday');
-  const listElementYesterday = document.getElementById('speciesListYesterday');
-  const confSliderYesterday = document.getElementById('confSliderYesterday');
-  const confValueYesterday = document.getElementById('confValueYesterday');
-  const statYesterday = document.getElementById('statYesterday');
 
   // Safety check
   if (!toggleButton || !listContainer || !listElement || !confSlider || !confValue || !statSpecies ||
@@ -56,19 +56,18 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   };
 
-  // Restore or set initial confidence values
-  const storedConfidence = localStorage.getItem('confSlider');
-  const initialConf = storedConfidence !== null ? parseFloat(storedConfidence) : 0.5;
+  // Restore confidence values from localStorage or default to 0.5
+  const initialConf = parseFloat(localStorage.getItem('confSlider')) || 0.5;
   confSlider.value = initialConf;
   confValue.textContent = initialConf.toFixed(2);
   updateSpeciesList(initialConf);
 
-  const storedConfidenceYesterday = localStorage.getItem('confSliderYesterday');
-  const initialConfYesterday = storedConfidenceYesterday !== null ? parseFloat(storedConfidenceYesterday) : 0.5;
+  const initialConfYesterday = parseFloat(localStorage.getItem('confSliderYesterday')) || 0.5;
   confSliderYesterday.value = initialConfYesterday;
   confValueYesterday.textContent = initialConfYesterday.toFixed(2);
   updateYesterdaySpeciesList(initialConfYesterday);
 
+  // Toggle list visibility
   let listVisible = false;
   let listVisibleYesterday = false;
 
@@ -92,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
     listContainerYesterday.classList.toggle('opacity-100', listVisibleYesterday);
   });
 
-  // Slider event listeners
+  // Slider change listeners
   confSlider.addEventListener('input', () => {
     const val = parseFloat(confSlider.value);
     confValue.textContent = val.toFixed(2);
