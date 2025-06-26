@@ -37,8 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  fetchStats();
-
   function fetchUniqueSpecies(conf) {
     fetch(`php/get_unique_species.php?conf=${conf}`)
       .then(r => r.json())
@@ -80,5 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     fetchYesterdaySpecies(initialConfYesterday);
   }
+
+  fetchStats();
 });
 
