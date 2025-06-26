@@ -22,16 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Set initial values
-  const initConfidence = 0.5;
-  confSlider.value = initConfidence;
-  confValue.textContent = initConfidence.toFixed(2);
-  updateSpeciesList(initConfidence);
+  // Restore or set initial confidence values
+  const storedConfidence = parseFloat(localStorage.getItem('confSlider')) || 0.5;
+  confSlider.value = storedConfidence;
+  confValue.textContent = storedConfidence.toFixed(2);
+  updateSpeciesList(storedConfidence);
 
-  const initConfidenceYesterday = 0.5;
-  confSliderYesterday.value = initConfidenceYesterday;
-  confValueYesterday.textContent = initConfidenceYesterday.toFixed(2);
-  updateYesterdaySpeciesList(initConfidenceYesterday);
+  const storedConfidenceYesterday = parseFloat(localStorage.getItem('confSliderYesterday')) || 0.5;
+  confSliderYesterday.value = storedConfidenceYesterday;
+  confValueYesterday.textContent = storedConfidenceYesterday.toFixed(2);
+  updateYesterdaySpeciesList(storedConfidenceYesterday);
 
   let listVisible = false;
   let listVisibleYesterday = false;
@@ -94,12 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
   confSlider.addEventListener('input', () => {
     const val = parseFloat(confSlider.value);
     confValue.textContent = val.toFixed(2);
+    localStorage.setItem('confSlider', val);
     updateSpeciesList(val);
   });
 
   confSliderYesterday.addEventListener('input', () => {
     const val = parseFloat(confSliderYesterday.value);
     confValueYesterday.textContent = val.toFixed(2);
+    localStorage.setItem('confSliderYesterday', val);
     updateYesterdaySpeciesList(val);
   });
 });
