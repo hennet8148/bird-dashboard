@@ -15,10 +15,34 @@
     </div>
   </header>
 
+  <!-- Controls -->
+  <section class="bg-white shadow mt-4 p-4">
+    <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Bird Selector -->
+      <div>
+        <label for="birdSelect" class="block text-sm font-medium text-gray-700">Select Bird</label>
+        <select id="birdSelect" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <option value="">-- Choose a bird --</option>
+        </select>
+      </div>
+
+      <!-- Time Selector -->
+      <div>
+        <label for="timeRange" class="block text-sm font-medium text-gray-700">Time Range</label>
+        <select id="timeRange" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <option value="last_hour">Last Hour</option>
+          <option value="today">Today</option>
+          <option value="yesterday">Yesterday</option>
+          <option value="last_week">Last 7 Days</option>
+          <option value="last_month">Last 30 Days</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
   <!-- Summary Stats -->
   <section class="container mx-auto mt-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
       <div class="bg-white p-4 rounded shadow text-center">
         <p class="text-sm text-gray-500">Total Sightings since 06/24/2025</p>
         <p id="statSightings" class="text-2xl font-bold">—</p>
@@ -27,7 +51,6 @@
       <div class="bg-white p-4 rounded shadow text-center">
         <p class="text-sm text-gray-500">Unique Species to date</p>
         <p id="statSpecies" class="text-2xl font-bold">—</p>
-        <!-- Confidence Slider UI for Unique Species -->
         <label for="confSlider" class="block text-sm font-medium mt-2 text-gray-700">Confidence Threshold</label>
         <input
           type="range"
@@ -44,7 +67,6 @@
       <div class="bg-white p-4 rounded shadow text-center">
         <p class="text-sm text-gray-500">Unique Species — Previous Day</p>
         <p id="statYesterday" class="text-xl font-bold">—</p>
-        <!-- Confidence Slider UI for Yesterday -->
         <label for="confSliderYesterday" class="block text-sm font-medium mt-2 text-gray-700">Confidence Threshold</label>
         <input
           type="range"
@@ -57,9 +79,18 @@
         />
         <span id="confValueYesterday" class="text-sm text-gray-600">0.50</span>
       </div>
-
     </div>
   </section>
+
+  <!-- Content Area -->
+  <main class="container mx-auto mt-8">
+    <div class="bg-white p-6 rounded shadow">
+      <h2 class="text-lg font-semibold mb-4">Data Explorer</h2>
+      <div id="dataExplorerContent">
+        <p>Loading data...</p>
+      </div>
+    </div>
+  </main>
 
   <!-- Scripts -->
   <script src="js/stats.js"></script>
