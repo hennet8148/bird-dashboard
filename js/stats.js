@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         if (data) {
           statSightings.textContent = data.total_sightings ?? '—';
-          statSpecies.textContent = data.total_species ?? '—';
           statYesterday.textContent = data.yesterday_species?.[initialConfYesterday.toFixed(2)] ?? '—';
         } else {
           statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
