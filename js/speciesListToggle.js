@@ -23,8 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Set initial values
-  confValue.textContent = parseFloat(confSlider.value).toFixed(2);
-  confValueYesterday.textContent = parseFloat(confSliderYesterday.value).toFixed(2);
+  const initConfidence = 0.5;
+  confSlider.value = initConfidence;
+  confValue.textContent = initConfidence.toFixed(2);
+  updateSpeciesList(initConfidence);
+
+  const initConfidenceYesterday = 0.5;
+  confSliderYesterday.value = initConfidenceYesterday;
+  confValueYesterday.textContent = initConfidenceYesterday.toFixed(2);
+  updateYesterdaySpeciesList(initConfidenceYesterday);
 
   let listVisible = false;
   let listVisibleYesterday = false;
@@ -82,13 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error fetching yesterday species list:', err);
       });
   };
-
-  // Initial loads
-  const initConfidence = parseFloat(confSlider.value);
-  updateSpeciesList(initConfidence);
-
-  const initConfidenceYesterday = parseFloat(confSliderYesterday.value);
-  updateYesterdaySpeciesList(initConfidenceYesterday);
 
   // Slider event listeners
   confSlider.addEventListener('input', () => {
