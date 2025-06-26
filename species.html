@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Species Detail</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-900 p-6">
+  <div class="max-w-3xl mx-auto">
+    <a href="index.html" class="text-sm text-blue-600 hover:underline">&larr; Back to Dashboard</a>
+
+    <h1 id="speciesName" class="text-3xl font-bold mt-4 mb-2">Loading...</h1>
+    <div id="speciesInfo" class="mb-4 text-gray-700"></div>
+
+    <div class="mt-6">
+      <h2 class="text-xl font-semibold mb-2">Recent Sightings</h2>
+      <ul id="sightingsList" class="space-y-2">
+        <li class="text-sm text-gray-500">Loading sightings...</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const species = params.get('name');
+
+      const speciesNameEl = document.getElementById('speciesName');
+      const speciesInfoEl = document.getElementById('speciesInfo');
+      const sightingsListEl = document.getElementById('sightingsList');
+
+      if (!species) {
+        speciesNameEl.textContent = 'Species Not Specified';
+        sightingsListEl.innerHTML = '<li class="text-red-500">No species specified in URL.</li>';
+        return;
+      }
+
+      speciesNameEl.textContent = species;
+
+      fetch(`php/get_species_data.php?name=${encodeURIComponent(species)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data || data.length === 0) {
+            sightingsListEl.innerHTML = '<li>No sightings available for this species.</li>';
+            return;
+          }
+
+          // Optional info blurb
+          const total = data.length;
+          const latest = new Date(data[0].timestamp).toLocaleString();
+          speciesInfoEl.textContent = `${total} total sightings. Most recent: ${latest}`;
+
+          sightingsListEl.innerHTML = '';
+          data.forEach(sighting => {
+            const li = document.createElement('li');
+            li.innerHTML = `
+              <div class="border p-3 rounded shadow-sm bg-gray-50">
+                <p class="font-mono text-sm"><strong>Time:</strong> ${new Date(sighting.timestamp).toLocaleString()}</p>
+                <p class="text-sm"><strong>Confidence:</strong> ${sighting.confidence}</p>
+              </div>
+            `;
+            sightingsListEl.appendChild(li);
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching species data:', err);
+          sightingsListEl.innerHTML = '<li>Error loading data.</li>';
+        });
+    });
+  </script>
+</body>
+</html>
+
