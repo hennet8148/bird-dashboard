@@ -67,11 +67,9 @@ document.addEventListener('DOMContentLoaded', () => {
   confSliderYesterday.value = initialConfYesterday;
   confValueYesterday.textContent = initialConfYesterday.toFixed(2);
 
-  // Delayed calls to avoid clobbering by stats.js
-  setTimeout(() => {
-    updateSpeciesList(initialConf);
-    updateYesterdaySpeciesList(initialConfYesterday);
-  }, 100);
+  // Fetch lists and set counts early — before other scripts overwrite
+  updateSpeciesList(initialConf);
+  updateYesterdaySpeciesList(initialConfYesterday);
 
   // Toggle list visibility
   let listVisible = false;
