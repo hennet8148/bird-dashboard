@@ -22,40 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  // Restore or set initial confidence values
-  const storedConfidence = parseFloat(localStorage.getItem('confSlider')) || 0.5;
-  confSlider.value = storedConfidence;
-  confValue.textContent = storedConfidence.toFixed(2);
-  updateSpeciesList(storedConfidence);
-
-  const storedConfidenceYesterday = parseFloat(localStorage.getItem('confSliderYesterday')) || 0.5;
-  confSliderYesterday.value = storedConfidenceYesterday;
-  confValueYesterday.textContent = storedConfidenceYesterday.toFixed(2);
-  updateYesterdaySpeciesList(storedConfidenceYesterday);
-
-  let listVisible = false;
-  let listVisibleYesterday = false;
-
-  toggleButton.addEventListener('click', () => {
-    listVisible = !listVisible;
-    toggleButton.textContent = listVisible ? 'Hide List ▲' : 'Show List ▼';
-    listContainer.classList.toggle('max-h-0', !listVisible);
-    listContainer.classList.toggle('opacity-0', !listVisible);
-    listContainer.classList.toggle('max-h-[600px]', listVisible);
-    listContainer.classList.toggle('overflow-y-auto', listVisible);
-    listContainer.classList.toggle('opacity-100', listVisible);
-  });
-
-  toggleButtonYesterday.addEventListener('click', () => {
-    listVisibleYesterday = !listVisibleYesterday;
-    toggleButtonYesterday.textContent = listVisibleYesterday ? 'Hide List ▲' : 'Show List ▼';
-    listContainerYesterday.classList.toggle('max-h-0', !listVisibleYesterday);
-    listContainerYesterday.classList.toggle('opacity-0', !listVisibleYesterday);
-    listContainerYesterday.classList.toggle('max-h-[600px]', listVisibleYesterday);
-    listContainerYesterday.classList.toggle('overflow-y-auto', listVisibleYesterday);
-    listContainerYesterday.classList.toggle('opacity-100', listVisibleYesterday);
-  });
-
   const updateSpeciesList = (confidence) => {
     fetch(`php/get_species_by_confidence.php?threshold=${confidence}`)
       .then(res => res.json())
@@ -89,6 +55,42 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error fetching yesterday species list:', err);
       });
   };
+
+  // Restore or set initial confidence values
+  const storedConfidence = localStorage.getItem('confSlider');
+  const initialConf = storedConfidence !== null ? parseFloat(storedConfidence) : 0.5;
+  confSlider.value = initialConf;
+  confValue.textContent = initialConf.toFixed(2);
+  updateSpeciesList(initialConf);
+
+  const storedConfidenceYesterday = localStorage.getItem('confSliderYesterday');
+  const initialConfYesterday = storedConfidenceYesterday !== null ? parseFloat(storedConfidenceYesterday) : 0.5;
+  confSliderYesterday.value = initialConfYesterday;
+  confValueYesterday.textContent = initialConfYesterday.toFixed(2);
+  updateYesterdaySpeciesList(initialConfYesterday);
+
+  let listVisible = false;
+  let listVisibleYesterday = false;
+
+  toggleButton.addEventListener('click', () => {
+    listVisible = !listVisible;
+    toggleButton.textContent = listVisible ? 'Hide List ▲' : 'Show List ▼';
+    listContainer.classList.toggle('max-h-0', !listVisible);
+    listContainer.classList.toggle('opacity-0', !listVisible);
+    listContainer.classList.toggle('max-h-[600px]', listVisible);
+    listContainer.classList.toggle('overflow-y-auto', listVisible);
+    listContainer.classList.toggle('opacity-100', listVisible);
+  });
+
+  toggleButtonYesterday.addEventListener('click', () => {
+    listVisibleYesterday = !listVisibleYesterday;
+    toggleButtonYesterday.textContent = listVisibleYesterday ? 'Hide List ▲' : 'Show List ▼';
+    listContainerYesterday.classList.toggle('max-h-0', !listVisibleYesterday);
+    listContainerYesterday.classList.toggle('opacity-0', !listVisibleYesterday);
+    listContainerYesterday.classList.toggle('max-h-[600px]', listVisibleYesterday);
+    listContainerYesterday.classList.toggle('overflow-y-auto', listVisibleYesterday);
+    listContainerYesterday.classList.toggle('opacity-100', listVisibleYesterday);
+  });
 
   // Slider event listeners
   confSlider.addEventListener('input', () => {
