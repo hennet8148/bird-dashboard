@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(r => r.json())
       .then(data => {
         statSpecies.textContent = data.count ?? '—';
+        statSpecies.classList.add('text-2xl', 'font-bold', 'text-black');
       })
       .catch(() => {
         statSpecies.textContent = '—';
@@ -52,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(r => r.json())
       .then(data => {
         statYesterday.textContent = data.count ?? '—';
+        statYesterday.classList.add('text-2xl', 'font-bold', 'text-black');
       })
       .catch(() => {
         statYesterday.textContent = '—';
