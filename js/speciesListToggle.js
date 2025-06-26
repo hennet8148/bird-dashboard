@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const listElement = document.getElementById('speciesList');
   const confSlider = document.getElementById('confSlider');
   const confValue = document.getElementById('confValue');
+  const statSpecies = document.getElementById('statSpecies');
 
   // Yesterday elements
   const toggleButtonYesterday = document.getElementById('toggleSpeciesListYesterday');
@@ -12,10 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const listElementYesterday = document.getElementById('speciesListYesterday');
   const confSliderYesterday = document.getElementById('confSliderYesterday');
   const confValueYesterday = document.getElementById('confValueYesterday');
+  const statYesterday = document.getElementById('statYesterday');
 
   // Safety check
-  if (!toggleButton || !listContainer || !listElement || !confSlider || !confValue ||
-      !toggleButtonYesterday || !listContainerYesterday || !listElementYesterday || !confSliderYesterday || !confValueYesterday) {
+  if (!toggleButton || !listContainer || !listElement || !confSlider || !confValue || !statSpecies ||
+      !toggleButtonYesterday || !listContainerYesterday || !listElementYesterday || !confSliderYesterday || !confValueYesterday || !statYesterday) {
     console.error('Toggle list: Required elements not found.');
     return;
   }
@@ -57,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
           li.textContent = name;
           listElement.appendChild(li);
         });
-        document.getElementById('statSpecies').textContent = data.length;
+        statSpecies.textContent = data.length;
       })
       .catch(err => {
         console.error('Error fetching species list:', err);
@@ -74,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
           li.textContent = name;
           listElementYesterday.appendChild(li);
         });
-        document.getElementById('statYesterday').textContent = data.length;
+        statYesterday.textContent = data.length;
       })
       .catch(err => {
         console.error('Error fetching yesterday species list:', err);
