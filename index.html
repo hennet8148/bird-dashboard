@@ -77,13 +77,27 @@
           value="0.5"
           class="w-full mt-1"
         />
-        <span id="confValue" class="text-sm text-gray-600">0.30</span>
+        <span id="confValue" class="text-sm text-gray-600">0.50</span>
       </div>
 
       <!-- Yesterday Unique Species -->
       <div class="bg-white p-4 rounded shadow text-center">
         <p class="text-sm text-gray-500">Unique Species — Previous Day</p>
         <p id="statYesterday" class="text-xl font-bold">—</p>
+
+        <!-- Toggle Button -->
+        <button id="toggleSpeciesListYesterday" class="text-sm text-blue-600 hover:underline mt-2">
+          Show List ▼
+        </button>
+
+        <!-- Hidden Collapsible List -->
+        <div id="speciesListContainerYesterday" class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700">
+          <ul id="speciesListYesterday" class="list-disc list-inside space-y-1 px-4 text-left">
+            <!-- Yesterday species will be dynamically inserted here -->
+          </ul>
+        </div>
+
+        <!-- Confidence Slider -->
         <label for="confSliderYesterday" class="block text-sm font-medium mt-2 text-gray-700">Confidence Threshold</label>
         <input
           type="range"
@@ -116,3 +130,4 @@
   <script src="js/speciesListToggle.js"></script>
 </body>
 </html>
+
