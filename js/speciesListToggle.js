@@ -84,8 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Initial loads
-  updateSpeciesList(parseFloat(confSlider.value));
-  updateYesterdaySpeciesList(parseFloat(confSliderYesterday.value));
+  const initConfidence = parseFloat(confSlider.value);
+  updateSpeciesList(initConfidence);
+
+  const initConfidenceYesterday = parseFloat(confSliderYesterday.value);
+  updateYesterdaySpeciesList(initConfidenceYesterday);
 
   // Slider event listeners
   confSlider.addEventListener('input', () => {
