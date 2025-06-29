@@ -78,11 +78,19 @@
   <!-- Summary Stats -->
   <section class="container mx-auto mt-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Total Sightings -->
-      <div class="bg-white p-4 rounded shadow text-center">
-        <p class="text-sm text-gray-500">Total Sightings since 06/24/2025</p>
-        <p id="statSightings" class="text-2xl font-bold mt-2">—</p>
-      </div>
+<!-- Total Sightings -->
+<div class="bg-white p-4 rounded shadow text-center">
+  <p class="text-sm text-gray-500">Total Sightings since 06/24/2025</p>
+  <p id="statSightings" class="text-2xl font-bold mt-2">—</p>
+
+  <!-- Divider -->
+  <div class="my-4 flex justify-center">
+    <div class="w-3/4 border-t border-gray-300"></div>
+  </div>
+
+  <!-- Timestamp -->
+  <p id="lastUpdatedSightings" class="text-xs text-gray-500">Last updated at —</p>
+</div>
 
       <!-- Unique Species -->
       <div class="bg-white p-4 rounded shadow text-center">
