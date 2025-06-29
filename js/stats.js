@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const confSliderYesterday = document.getElementById('confSliderYesterday');
   const confValueYesterday = document.getElementById('confValueYesterday');
 
+  const lastUpdatedSightings = document.getElementById('lastUpdatedSightings'); // ← NEW
+
   // Clear saved values on initial load for fresh defaults
   localStorage.removeItem('confSlider');
   localStorage.removeItem('confSliderYesterday');
@@ -27,6 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         if (data) {
           statSightings.textContent = data.total_sightings ?? '—';
+
+          // Set timestamp if element exists
+          if (lastUpdatedSightings) {
+            const now = new Date();
+            lastUpdatedSightings.textContent = 'Last updated at ' +
+              now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          }
         } else {
           statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
         }
