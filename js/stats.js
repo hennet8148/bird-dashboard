@@ -32,8 +32,8 @@ document.addEventListener('DOMContentLoaded', () => {
           statSightings.textContent = data.total_sightings ?? '—';
 
           if (lastUpdatedSightings && data.last_updated) {
-            const utcDate = new Date(data.last_updated + 'Z');
             console.log("DEBUG: UTC parsed date →", utcDate);
+const dt = new Date(data.last_updated.replace(' ', 'T'));
 
             const localTime = utcDate.toLocaleTimeString('en-US', {
               hour: '2-digit',
