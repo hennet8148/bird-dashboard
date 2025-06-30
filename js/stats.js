@@ -32,10 +32,10 @@ document.addEventListener('DOMContentLoaded', () => {
           statSightings.textContent = data.total_sightings ?? '—';
 
           if (lastUpdatedSightings && data.last_updated) {
-            const utcDate = new Date(data.last_updated + 'Z');
-            console.log("DEBUG: UTC parsed date →", utcDate);
+            const localDate = new Date(data.last_updated.replace(' ', 'T'));
+            console.log("DEBUG: local parsed date →", localDate);
 
-            const localTime = utcDate.toLocaleTimeString('en-US', {
+            const localTime = localDate.toLocaleTimeString('en-US', {
               hour: '2-digit',
               minute: '2-digit',
               timeZone: 'America/New_York',
