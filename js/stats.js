@@ -30,9 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
           if (lastUpdatedSightings && data.last_updated) {
-            // Parse UTC string into local time
+            // Convert timestamp to America/New_York time zone
             const dt = new Date(data.last_updated + 'Z');
-            const options = { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
+            const options = {
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZone: 'America/New_York',
+              timeZoneName: 'short'
+            };
             lastUpdatedSightings.textContent = 'Last updated at ' +
               dt.toLocaleTimeString([], options);
           }
