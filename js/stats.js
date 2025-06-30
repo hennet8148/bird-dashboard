@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const statSightings = document.getElementById('statSightings');
   const statSpecies = document.getElementById('statSpecies');
   const statYesterday = document.getElementById('statYesterday');
+  const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
 
   const confSlider = document.getElementById('confSlider');
   const confValue = document.getElementById('confValue');
@@ -20,23 +21,32 @@ document.addEventListener('DOMContentLoaded', () => {
   confSliderYesterday.value = initialConfYesterday;
   confValueYesterday.textContent = initialConfYesterday.toFixed(2);
 
+  // Fetch updated stats
   function fetchStats() {
     fetch('php/stats.php')
       .then(response => response.json())
       .then(data => {
+        console.log("DEBUG: stats.php returned →", data);
+
         if (data) {
           statSightings.textContent = data.total_sightings ?? '—';
 
-          const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
           if (lastUpdatedSightings && data.last_updated) {
-            const utcDate = new Date(data.last_updated + 'Z'); // ensure UTC
+            const utcDate = new Date(data.last_updated + 'Z');
+            console.log("DEBUG: UTC parsed date →", utcDate);
+
             const localTime = utcDate.toLocaleTimeString('en-US', {
               hour: '2-digit',
               minute: '2-digit',
               timeZone: 'America/New_York',
               timeZoneName: 'short'
             });
+
+            console.log("DEBUG: formatted localTime →", localTime);
             lastUpdatedSightings.textContent = 'Last updated at ' + localTime;
+          } else {
+            console.warn("Missing last_updated field in data");
+            lastUpdatedSightings.textContent = 'Last updated at —';
           }
         } else {
           statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
@@ -45,6 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch(err => {
         console.error('Failed to fetch stats:', err);
         statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
+        if (lastUpdatedSightings) {
+          lastUpdatedSightings.textContent = 'Last updated at —';
+        }
       });
   }
 
@@ -83,5 +96,15 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (confSliderYesterday && confValueYesterday) {
-    confSliderYesterday.addEven
+    confSliderYesterday.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      confValueYesterday.textContent = val.toFixed(2);
+      localStorage.setItem('confSliderYesterday', val);
+      fetchYesterdaySpecies(val);
+    });
+    fetchYesterdaySpecies(initialConfYesterday);
+  }
+
+  fetchStats();
+});
 
