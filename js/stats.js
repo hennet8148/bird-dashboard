@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
           if (lastUpdatedSightings && data.last_updated) {
-            const dt = new Date(data.last_updated + ' UTC');
+            const dt = new Date(data.last_updated + ' Z');
             lastUpdatedSightings.textContent = 'Last updated at ' +
               dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
           }
