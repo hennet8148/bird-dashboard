@@ -8,8 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const confSliderYesterday = document.getElementById('confSliderYesterday');
   const confValueYesterday = document.getElementById('confValueYesterday');
 
-  const lastUpdatedSightings = document.getElementById('lastUpdatedSightings'); // ← NEW
-
   // Clear saved values on initial load for fresh defaults
   localStorage.removeItem('confSlider');
   localStorage.removeItem('confSliderYesterday');
@@ -30,7 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data) {
           statSightings.textContent = data.total_sightings ?? '—';
 
-          // Set timestamp if element exists
+          // Get fresh reference to the DOM element
+          const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
           if (lastUpdatedSightings) {
             const now = new Date();
             lastUpdatedSightings.textContent = 'Last updated at ' +
