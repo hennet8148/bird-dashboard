@@ -1,14 +1,9 @@
 <?php
 header('Content-Type: application/json');
-
-// DB config
-$host = 'localhost';
-$db = 'birdnet_db';
-$user = 'birdnet_user';
-$pass = 'BIRD.stuff.NOW123!';
+require_once 'db.php';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
+    // Connect using PDO from db.php
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
     // Total sightings
@@ -42,14 +37,13 @@ try {
     }
 
     echo json_encode([
-        'total_sightings' => $totalSightings,
-        'total_species' => $totalSpecies,
+        'total_sightings'   => $totalSightings,
+        'total_species'     => $totalSpecies,
         'yesterday_species' => $speciesCounts,
-        'last_updated' => $lastUpdated
+        'last_updated'      => $lastUpdated
     ]);
 
 } catch (PDOException $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Database connection failed: ' . $e->getMessage()]);
-}
+    echo json_encode(['error' => 'Database co]()_
 
