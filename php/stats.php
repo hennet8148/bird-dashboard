@@ -17,6 +17,9 @@ try {
     // Total unique species all time
     $totalSpecies = $pdo->query("SELECT COUNT(DISTINCT species_common_name) FROM sightings")->fetchColumn();
 
+    // Most recent detection timestamp
+    $lastUpdated = $pdo->query("SELECT MAX(timestamp) FROM sightings")->fetchColumn();
+
     // Yesterday’s date
     $yesterday = date('Y-m-d', strtotime('-1 day'));
 
@@ -41,7 +44,8 @@ try {
     echo json_encode([
         'total_sightings' => $totalSightings,
         'total_species' => $totalSpecies,
-        'yesterday_species' => $speciesCounts
+        'yesterday_species' => $speciesCounts,
+        'last_updated' => $lastUpdated
     ]);
 
 } catch (PDOException $e) {
