@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', () => {
   confSliderYesterday.value = initialConfYesterday;
   confValueYesterday.textContent = initialConfYesterday.toFixed(2);
 
-  // Fetch updated data
   function fetchStats() {
     fetch('php/stats.php')
       .then(response => response.json())
@@ -30,16 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
           if (lastUpdatedSightings && data.last_updated) {
-            // Convert timestamp to America/New_York time zone
-            const dt = new Date(data.last_updated + 'Z');
-            const options = {
+            const utcDate = new Date(data.last_updated + 'Z'); // ensure UTC
+            const localTime = utcDate.toLocaleTimeString('en-US', {
               hour: '2-digit',
               minute: '2-digit',
               timeZone: 'America/New_York',
               timeZoneName: 'short'
-            };
-            lastUpdatedSightings.textContent = 'Last updated at ' +
-              dt.toLocaleTimeString([], options);
+            });
+            lastUpdatedSightings.textContent = 'Last updated at ' + localTime;
           }
         } else {
           statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
@@ -86,15 +83,5 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (confSliderYesterday && confValueYesterday) {
-    confSliderYesterday.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      confValueYesterday.textContent = val.toFixed(2);
-      localStorage.setItem('confSliderYesterday', val);
-      fetchYesterdaySpecies(val);
-    });
-    fetchYesterdaySpecies(initialConfYesterday);
-  }
-
-  fetchStats();
-});
+    confSliderYesterday.addEven
 
