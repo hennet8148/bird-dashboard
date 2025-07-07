@@ -16,8 +16,8 @@ $targetFile = __DIR__ . "/$code.php";
 // Redirect immediately if the file already exists
 if (file_exists($targetFile)) {
     // Uncomment when you want to redirect instead of debug
-    // header("Location: $code.php");
-    // exit;
+ header("Location: $code.php");
+ exit;
     echo "✅ File already exists: $targetFile\n";
     exit;
 }
