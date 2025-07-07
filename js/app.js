@@ -4,7 +4,6 @@ function createSortableHeader(text, key, currentSort, setSort) {
   th.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider', 'cursor-pointer');
   th.textContent = text;
 
-  // Add sort indicator if sorting by this column
   if (currentSort.key === key) {
     const arrow = document.createElement('span');
     arrow.textContent = currentSort.asc ? ' ▲' : ' ▼';
@@ -13,10 +12,8 @@ function createSortableHeader(text, key, currentSort, setSort) {
 
   th.addEventListener('click', () => {
     if (currentSort.key === key) {
-      // Toggle asc/desc
       setSort({ key, asc: !currentSort.asc });
     } else {
-      // New sort key, ascending
       setSort({ key, asc: true });
     }
   });
@@ -29,14 +26,13 @@ function fetchSightingsByTimeRange(timeRange, sort) {
     .then(res => res.json())
     .then(data => {
       const container = document.getElementById('dataExplorerContent');
-      container.innerHTML = ''; // Clear previous
+      container.innerHTML = '';
 
       if (!data.length) {
         container.textContent = 'No sightings found for this time range.';
         return;
       }
 
-      // Apply sorting client-side for now
       if (sort && sort.key) {
         data.sort((a, b) => {
           if (a[sort.key] < b[sort.key]) return sort.asc ? -1 : 1;
@@ -48,7 +44,6 @@ function fetchSightingsByTimeRange(timeRange, sort) {
       const table = document.createElement('table');
       table.classList.add('min-w-full', 'divide-y', 'divide-gray-200');
 
-      // Table header
       const thead = document.createElement('thead');
       thead.classList.add('bg-gray-50');
       const trHead = document.createElement('tr');
@@ -73,7 +68,11 @@ function fetchSightingsByTimeRange(timeRange, sort) {
       data.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${row.species_common_name}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+            <a href="/birds/bird.php?code=${row.species_code}" class="text-blue-600 hover:underline">
+              ${row.species_common_name}
+            </a>
+          </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.sightings_count}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.avg_confidence).toFixed(2)}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.max_confidence).toFixed(2)}</td>
@@ -100,16 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
       fetchSightingsByTimeRange(e.target.value);
     });
 
-    // Set default sort
     fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
 
-    // Load default time range data on page load
     fetchSightingsByTimeRange(timeRangeSelect.value, fetchSightingsByTimeRange.currentSort);
   }
 });
-// ... your existing code ...
 
-// Add this new function to fetch sightings for a selected bird and time range
 function fetchSightingsByBird(bird, timeRange) {
   const container = document.getElementById('dataExplorerContent');
   if (!bird) {
@@ -150,7 +145,7 @@ function fetchSightingsByBird(bird, timeRange) {
       });
 
       table.appendChild(tbody);
-      container.innerHTML = ''; // Clear old content
+      container.innerHTML = '';
       container.appendChild(table);
     })
     .catch(err => {
@@ -172,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (selectedBird) {
         fetchSightingsByBird(selectedBird, selectedTime);
       } else {
-        // If no bird selected, fallback to time range summary table
         fetchSightingsByTimeRange(selectedTime, fetchSightingsByTimeRange.currentSort);
       }
     }
@@ -180,10 +174,8 @@ document.addEventListener('DOMContentLoaded', () => {
     birdSelect.addEventListener('change', updateDataExplorer);
     timeRangeSelect.addEventListener('change', updateDataExplorer);
 
-    // Set default sort for summary table
     fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
 
-    // Initial load: show summary or bird data depending on bird selection
     updateDataExplorer();
   }
 });
