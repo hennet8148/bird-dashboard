@@ -1,7 +1,7 @@
 <?php
 // bird.php — router to create and redirect to a species static page using PDO
 
-require_once '../php/db.php';
+require_once __DIR__ . '/php/db.php';
 
 $code = $_GET['code'] ?? '';
 $code = preg_replace('/[^a-z0-9]/', '', strtolower($code)); // sanitize
