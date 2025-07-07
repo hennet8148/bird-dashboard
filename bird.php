@@ -23,7 +23,16 @@ if (file_exists($targetFile)) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT species_code, species_common_name, scientific_name, slug, aab_url FROM species_codes WHERE species_code = ?");
+    $stmt = $pdo->prepare("
+        SELECT 
+            species_code, 
+            species_common_name, 
+            scientific_name, 
+            url_slug AS slug, 
+            external_link AS aab_url 
+        FROM species_codes 
+        WHERE species_code = ?
+    ");
     $stmt->execute([$code]);
     $species = $stmt->fetch(PDO::FETCH_ASSOC);
 
