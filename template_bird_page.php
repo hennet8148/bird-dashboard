@@ -9,7 +9,7 @@
 </head>
 <body class="bg-white text-gray-800">
   <div class="max-w-4xl mx-auto p-6">
-    <a href="/dashboard/species.html" class="text-sm text-blue-600 hover:underline">&larr; Back to Species List</a>
+    <a href="javascript:history.back()" class="text-sm text-blue-600 hover:underline">&larr; Return to Previous Page</a>
 
     <h1 class="text-3xl font-serif mt-4 mb-2">{{common_name}}</h1>
     <p class="text-gray-600 italic mb-6">{{sci_name}}</p>
