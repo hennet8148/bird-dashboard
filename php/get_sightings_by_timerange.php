@@ -35,7 +35,7 @@ $stmt = $pdo->prepare("
         AVG(s.confidence) AS avg_confidence,
         MAX(s.confidence) AS max_confidence
     FROM sightings s
-    WHERE $timeCondition AND s.species_code IS NOT NULL
+    WHERE $timeCondition
     GROUP BY s.species_code, s.species_common_name
     ORDER BY sightings_count DESC
     LIMIT 100
