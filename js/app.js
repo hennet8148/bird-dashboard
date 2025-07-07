@@ -17,7 +17,7 @@ function createSortableHeader(text, key, currentSort, setSort) {
       setSort({ key, asc: !currentSort.asc });
     } else {
       // New sort key, ascending
-      setSort({ key, asc: true });
+      setSort({ key: key, asc: true });
     }
   });
 
@@ -73,7 +73,9 @@ function fetchSightingsByTimeRange(timeRange, sort) {
       data.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${row.species_common_name}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-700 underline cursor-pointer">
+            <a href="bird.php?code=${encodeURIComponent(row.species_code)}">${row.species_common_name}</a>
+          </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.sightings_count}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.avg_confidence).toFixed(2)}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.max_confidence).toFixed(2)}</td>
@@ -107,7 +109,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchSightingsByTimeRange(timeRangeSelect.value, fetchSightingsByTimeRange.currentSort);
   }
 });
-// ... your existing code ...
 
 // Add this new function to fetch sightings for a selected bird and time range
 function fetchSightingsByBird(bird, timeRange) {

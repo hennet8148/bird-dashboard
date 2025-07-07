@@ -28,15 +28,15 @@ switch ($timeRange) {
 }
 
 $stmt = $pdo->prepare("
-    SELECT s.species_common_name,
-           COUNT(*) as sightings_count,
-           AVG(s.confidence) as avg_confidence,
-           MAX(s.confidence) as max_confidence,
-           sc.url_slug
+    SELECT 
+        s.species_code,
+        s.species_common_name,
+        COUNT(*) AS sightings_count,
+        AVG(s.confidence) AS avg_confidence,
+        MAX(s.confidence) AS max_confidence
     FROM sightings s
-    LEFT JOIN species_codes sc ON s.species_code = sc.species_code
-    WHERE $timeCondition
-    GROUP BY s.species_common_name
+    WHERE $timeCondition AND s.species_code IS NOT NULL
+    GROUP BY s.species_code, s.species_common_name
     ORDER BY sightings_count DESC
     LIMIT 100
 ");
