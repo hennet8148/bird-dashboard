@@ -15,7 +15,10 @@ $targetFile = __DIR__ . "/$code.php";
 
 // Redirect immediately if the file already exists
 if (file_exists($targetFile)) {
-    header("Location: $code.php");
+    // Comment out for debugging — uncomment when working
+    // header("Location: $code.php");
+    // exit;
+    echo "✅ File already exists: $targetFile\n";
     exit;
 }
 
@@ -32,10 +35,24 @@ try {
     $templateFile = __DIR__ . "/template_bird_page.php";
     if (!file_exists($templateFile)) {
         http_response_code(500);
-        exit("Template file not found.");
+        exit("❌ Template file not found: $templateFile");
+    }
+
+    if (!is_readable($templateFile)) {
+        http_response_code(500);
+        exit("❌ Template file not readable: $templateFile");
+    }
+
+    if (!is_writable(__DIR__)) {
+        http_response_code(500);
+        exit("❌ Directory not writable: " . __DIR__);
     }
 
     $template = file_get_contents($templateFile);
+    if ($template === false) {
+        http_response_code(500);
+        exit("❌ Failed to read template file.");
+    }
 
     $page = str_replace(
         ['{{common_name}}', '{{sci_name}}', '{{slug}}', '{{aab_url}}', '{{species_code}}'],
@@ -49,16 +66,22 @@ try {
         $template
     );
 
+    // Debug preview
+    echo "🔧 Attempting to write file: $targetFile\n";
+    echo "✏️ Template data (first 200 chars):\n" . substr($page, 0, 200) . "\n\n";
+
     if (!file_put_contents($targetFile, $page)) {
         http_response_code(500);
-        exit("Failed to create species page.");
+        exit("❌ Failed to create species page: $targetFile");
     }
 
-    header("Location: $code.php");
+    echo "✅ Page written successfully.\n";
+    // Comment out during debugging
+    // header("Location: $code.php");
     exit;
 
 } catch (PDOException $e) {
     http_response_code(500);
-    exit("Database error: " . $e->getMessage());
+    exit("❌ Database error: " . $e->getMessage());
 }
 
