@@ -29,14 +29,14 @@ switch ($timeRange) {
 
 $sql = "
     SELECT 
-        COALESCE(sc.species_code, 'unknown') AS species_code,
+        sc.species_code,
         s.species_common_name,
         COUNT(*) AS sightings_count,
         AVG(s.confidence) AS avg_confidence,
         MAX(s.confidence) AS max_confidence
     FROM sightings s
-    LEFT JOIN species_codes sc
-        ON s.species_common_name = sc.species_common_name
+    INNER JOIN species_codes sc
+        ON TRIM(LOWER(s.species_common_name)) = TRIM(LOWER(sc.species_common_name))
     WHERE $timeCondition
     GROUP BY s.species_common_name, sc.species_code
     ORDER BY sightings_count DESC
