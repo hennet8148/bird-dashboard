@@ -9,38 +9,41 @@ $timeRange = $_GET['timerange'] ?? 'last_hour';
 
 switch ($timeRange) {
     case 'last_hour':
-        $timeCondition = "timestamp >= NOW() - INTERVAL 1 HOUR";
+        $timeCondition = "s.timestamp >= NOW() - INTERVAL 1 HOUR";
         break;
     case 'today':
-        $timeCondition = "DATE(timestamp) = CURDATE()";
+        $timeCondition = "DATE(s.timestamp) = CURDATE()";
         break;
     case 'yesterday':
-        $timeCondition = "DATE(timestamp) = CURDATE() - INTERVAL 1 DAY";
+        $timeCondition = "DATE(s.timestamp) = CURDATE() - INTERVAL 1 DAY";
         break;
     case 'last_week':
-        $timeCondition = "timestamp >= NOW() - INTERVAL 7 DAY";
+        $timeCondition = "s.timestamp >= NOW() - INTERVAL 7 DAY";
         break;
     case 'last_month':
-        $timeCondition = "timestamp >= NOW() - INTERVAL 30 DAY";
+        $timeCondition = "s.timestamp >= NOW() - INTERVAL 30 DAY";
         break;
     default:
-        $timeCondition = "timestamp >= NOW() - INTERVAL 1 HOUR";
+        $timeCondition = "s.timestamp >= NOW() - INTERVAL 1 HOUR";
 }
 
-$stmt = $pdo->prepare("
+$sql = "
     SELECT 
-        s.species_code,
+        COALESCE(sc.species_code, 'unknown') AS species_code,
         s.species_common_name,
         COUNT(*) AS sightings_count,
         AVG(s.confidence) AS avg_confidence,
         MAX(s.confidence) AS max_confidence
     FROM sightings s
+    LEFT JOIN species_codes sc
+        ON s.species_common_name = sc.species_common_name
     WHERE $timeCondition
-    GROUP BY s.species_code, s.species_common_name
+    GROUP BY s.species_common_name, sc.species_code
     ORDER BY sightings_count DESC
     LIMIT 100
-");
+";
 
+$stmt = $pdo->prepare($sql);
 $stmt->execute();
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
