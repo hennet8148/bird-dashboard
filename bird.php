@@ -15,7 +15,7 @@ $targetFile = __DIR__ . "/$code.php";
 
 // Redirect immediately if the file already exists
 if (file_exists($targetFile)) {
-    // Comment out for debugging — uncomment when working
+    // Uncomment when you want to redirect instead of debug
     // header("Location: $code.php");
     // exit;
     echo "✅ File already exists: $targetFile\n";
@@ -23,6 +23,7 @@ if (file_exists($targetFile)) {
 }
 
 try {
+    // Query species data from species_codes table
     $stmt = $pdo->prepare("
         SELECT 
             species_code, 
@@ -41,6 +42,7 @@ try {
         exit("Species code not found in database.");
     }
 
+    // Validate template file
     $templateFile = __DIR__ . "/template_bird_page.php";
     if (!file_exists($templateFile)) {
         http_response_code(500);
@@ -63,6 +65,7 @@ try {
         exit("❌ Failed to read template file.");
     }
 
+    // Populate template with species data
     $page = str_replace(
         ['{{common_name}}', '{{sci_name}}', '{{slug}}', '{{aab_url}}', '{{species_code}}'],
         [
@@ -75,17 +78,19 @@ try {
         $template
     );
 
-    // Debug preview
+    // Debug info
     echo "🔧 Attempting to write file: $targetFile\n";
     echo "✏️ Template data (first 200 chars):\n" . substr($page, 0, 200) . "\n\n";
 
+    // Write the species page
     if (!file_put_contents($targetFile, $page)) {
         http_response_code(500);
         exit("❌ Failed to create species page: $targetFile");
     }
 
     echo "✅ Page written successfully.\n";
-    // Comment out during debugging
+
+    // Uncomment to redirect after page creation
     // header("Location: $code.php");
     exit;
 
