@@ -91,7 +91,7 @@ try {
     echo "✅ Page written successfully.\n";
 
     // Uncomment to redirect after page creation
-    // header("Location: $code.php");
+    header("Location: $code.php");
     exit;
 
 } catch (PDOException $e) {
