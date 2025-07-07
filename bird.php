@@ -1,29 +1,36 @@
 <?php
-// bird.php — router to create and redirect to a species static page using PDO
+// bird.php — create and redirect to a species static page using PDO
 
 require_once __DIR__ . '/php/db.php';
 
+// Get and sanitize species code
 $code = $_GET['code'] ?? '';
-$code = preg_replace('/[^a-z0-9]/', '', strtolower($code)); // sanitize
+$code = preg_replace('/[^a-z0-9]/', '', strtolower($code));
 
 if (!$code) {
     http_response_code(400);
     exit('Missing or invalid species code.');
 }
 
-$targetFile = __DIR__ . "/$code.php";
+// Create species directory if needed
+$speciesDir = __DIR__ . '/species';
+if (!is_dir($speciesDir)) {
+    if (!mkdir($speciesDir, 0755, true)) {
+        http_response_code(500);
+        exit("❌ Failed to create directory: $speciesDir");
+    }
+}
+
+$targetFile = "$speciesDir/$code.php";
 
 // Redirect immediately if the file already exists
 if (file_exists($targetFile)) {
-    // Uncomment when you want to redirect instead of debug
- header("Location: $code.php");
- exit;
-    echo "✅ File already exists: $targetFile\n";
+    header("Location: species/$code.php");
     exit;
 }
 
 try {
-    // Query species data from species_codes table
+    // Look up species info
     $stmt = $pdo->prepare("
         SELECT 
             species_code, 
@@ -42,21 +49,11 @@ try {
         exit("Species code not found in database.");
     }
 
-    // Validate template file
-    $templateFile = __DIR__ . "/template_bird_page.php";
-    if (!file_exists($templateFile)) {
+    // Validate and read template
+    $templateFile = __DIR__ . '/template_bird_page.php';
+    if (!file_exists($templateFile) || !is_readable($templateFile)) {
         http_response_code(500);
-        exit("❌ Template file not found: $templateFile");
-    }
-
-    if (!is_readable($templateFile)) {
-        http_response_code(500);
-        exit("❌ Template file not readable: $templateFile");
-    }
-
-    if (!is_writable(__DIR__)) {
-        http_response_code(500);
-        exit("❌ Directory not writable: " . __DIR__);
+        exit("❌ Template not found or unreadable: $templateFile");
     }
 
     $template = file_get_contents($templateFile);
@@ -65,7 +62,7 @@ try {
         exit("❌ Failed to read template file.");
     }
 
-    // Populate template with species data
+    // Replace placeholders
     $page = str_replace(
         ['{{common_name}}', '{{sci_name}}', '{{slug}}', '{{aab_url}}', '{{species_code}}'],
         [
@@ -78,20 +75,14 @@ try {
         $template
     );
 
-    // Debug info
-    echo "🔧 Attempting to write file: $targetFile\n";
-    echo "✏️ Template data (first 200 chars):\n" . substr($page, 0, 200) . "\n\n";
-
-    // Write the species page
+    // Write new species file
     if (!file_put_contents($targetFile, $page)) {
         http_response_code(500);
-        exit("❌ Failed to create species page: $targetFile");
+        exit("❌ Failed to write species page: $targetFile");
     }
 
-    echo "✅ Page written successfully.\n";
-
-    // Uncomment to redirect after page creation
-    header("Location: $code.php");
+    // Redirect to the new static page
+    header("Location: species/$code.php");
     exit;
 
 } catch (PDOException $e) {
