@@ -1,17 +1,7 @@
 // Helper to create sortable table headers
 function createSortableHeader(text, key, currentSort, setSort) {
   const th = document.createElement('th');
-  th.classList.add(
-    'px-6',
-    'py-3',
-    'text-left',
-    'text-xs',
-    'font-medium',
-    'text-gray-500',
-    'uppercase',
-    'tracking-wider',
-    'cursor-pointer'
-  );
+  th.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider', 'cursor-pointer');
   th.textContent = text;
 
   // Add sort indicator if sorting by this column
@@ -23,8 +13,10 @@ function createSortableHeader(text, key, currentSort, setSort) {
 
   th.addEventListener('click', () => {
     if (currentSort.key === key) {
+      // Toggle asc/desc
       setSort({ key, asc: !currentSort.asc });
     } else {
+      // New sort key, ascending
       setSort({ key, asc: true });
     }
   });
@@ -34,16 +26,17 @@ function createSortableHeader(text, key, currentSort, setSort) {
 
 function fetchSightingsByTimeRange(timeRange, sort) {
   fetch(`php/get_sightings_by_timerange.php?timerange=${timeRange}`)
-    .then((res) => res.json())
-    .then((data) => {
+    .then(res => res.json())
+    .then(data => {
       const container = document.getElementById('dataExplorerContent');
-      container.innerHTML = '';
+      container.innerHTML = ''; // Clear previous
 
       if (!data.length) {
         container.textContent = 'No sightings found for this time range.';
         return;
       }
 
+      // Apply sorting client-side for now
       if (sort && sort.key) {
         data.sort((a, b) => {
           if (a[sort.key] < b[sort.key]) return sort.asc ? -1 : 1;
@@ -55,32 +48,21 @@ function fetchSightingsByTimeRange(timeRange, sort) {
       const table = document.createElement('table');
       table.classList.add('min-w-full', 'divide-y', 'divide-gray-200');
 
+      // Table header
       const thead = document.createElement('thead');
       thead.classList.add('bg-gray-50');
       const trHead = document.createElement('tr');
 
-      const currentSort =
-        fetchSightingsByTimeRange.currentSort || {
-          key: 'sightings_count',
-          asc: false,
-        };
+      const currentSort = fetchSightingsByTimeRange.currentSort || { key: 'sightings_count', asc: false };
       const setSort = (newSort) => {
         fetchSightingsByTimeRange.currentSort = newSort;
         fetchSightingsByTimeRange(timeRange, newSort);
       };
 
-      trHead.appendChild(
-        createSortableHeader('Species', 'species_common_name', currentSort, setSort)
-      );
-      trHead.appendChild(
-        createSortableHeader('Sightings', 'sightings_count', currentSort, setSort)
-      );
-      trHead.appendChild(
-        createSortableHeader('Avg Confidence', 'avg_confidence', currentSort, setSort)
-      );
-      trHead.appendChild(
-        createSortableHeader('Max Confidence', 'max_confidence', currentSort, setSort)
-      );
+      trHead.appendChild(createSortableHeader('Species', 'species_common_name', currentSort, setSort));
+      trHead.appendChild(createSortableHeader('Sightings', 'sightings_count', currentSort, setSort));
+      trHead.appendChild(createSortableHeader('Avg Confidence', 'avg_confidence', currentSort, setSort));
+      trHead.appendChild(createSortableHeader('Max Confidence', 'max_confidence', currentSort, setSort));
 
       thead.appendChild(trHead);
       table.appendChild(thead);
@@ -88,22 +70,13 @@ function fetchSightingsByTimeRange(timeRange, sort) {
       const tbody = document.createElement('tbody');
       tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
 
-      data.forEach((row) => {
+      data.forEach(row => {
         const tr = document.createElement('tr');
-
-        const speciesLink = row.url_slug
-          ? `<a href="birds/${row.url_slug}.html" class="text-blue-600 hover:underline">${row.species_common_name}</a>`
-          : row.species_common_name;
-
         tr.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${speciesLink}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${row.species_common_name}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.sightings_count}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(
-            row.avg_confidence
-          ).toFixed(2)}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(
-            row.max_confidence
-          ).toFixed(2)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.avg_confidence).toFixed(2)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.max_confidence).toFixed(2)}</td>
         `;
         tbody.appendChild(tr);
       });
@@ -111,7 +84,7 @@ function fetchSightingsByTimeRange(timeRange, sort) {
       table.appendChild(tbody);
       container.appendChild(table);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('Error fetching sightings:', err);
       const container = document.getElementById('dataExplorerContent');
       container.textContent = 'Failed to load data.';
@@ -127,19 +100,16 @@ document.addEventListener('DOMContentLoaded', () => {
       fetchSightingsByTimeRange(e.target.value);
     });
 
-    fetchSightingsByTimeRange.currentSort = {
-      key: 'sightings_count',
-      asc: false,
-    };
+    // Set default sort
+    fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
 
-    fetchSightingsByTimeRange(
-      timeRangeSelect.value,
-      fetchSightingsByTimeRange.currentSort
-    );
+    // Load default time range data on page load
+    fetchSightingsByTimeRange(timeRangeSelect.value, fetchSightingsByTimeRange.currentSort);
   }
 });
+// ... your existing code ...
 
-// Fetch sightings by bird and time range
+// Add this new function to fetch sightings for a selected bird and time range
 function fetchSightingsByBird(bird, timeRange) {
   const container = document.getElementById('dataExplorerContent');
   if (!bird) {
@@ -148,11 +118,10 @@ function fetchSightingsByBird(bird, timeRange) {
   }
 
   fetch(`php/get_sightings_by_bird.php?bird=${encodeURIComponent(bird)}&timerange=${timeRange}`)
-    .then((res) => res.json())
-    .then((data) => {
+    .then(res => res.json())
+    .then(data => {
       if (!data.length) {
-        container.innerHTML =
-          '<p>No sightings found for this bird and time range.</p>';
+        container.innerHTML = '<p>No sightings found for this bird and time range.</p>';
         return;
       }
 
@@ -171,22 +140,20 @@ function fetchSightingsByBird(bird, timeRange) {
       const tbody = document.createElement('tbody');
       tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
 
-      data.forEach((row) => {
+      data.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.timestamp}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(
-            row.confidence
-          ).toFixed(2)}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.confidence).toFixed(2)}</td>
         `;
         tbody.appendChild(tr);
       });
 
       table.appendChild(tbody);
-      container.innerHTML = '';
+      container.innerHTML = ''; // Clear old content
       container.appendChild(table);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error('Error fetching bird sightings:', err);
       container.innerHTML = '<p>Failed to load bird data.</p>';
     });
@@ -205,21 +172,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (selectedBird) {
         fetchSightingsByBird(selectedBird, selectedTime);
       } else {
-        fetchSightingsByTimeRange(
-          selectedTime,
-          fetchSightingsByTimeRange.currentSort
-        );
+        // If no bird selected, fallback to time range summary table
+        fetchSightingsByTimeRange(selectedTime, fetchSightingsByTimeRange.currentSort);
       }
     }
 
     birdSelect.addEventListener('change', updateDataExplorer);
     timeRangeSelect.addEventListener('change', updateDataExplorer);
 
-    fetchSightingsByTimeRange.currentSort = {
-      key: 'sightings_count',
-      asc: false,
-    };
+    // Set default sort for summary table
+    fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
 
+    // Initial load: show summary or bird data depending on bird selection
     updateDataExplorer();
   }
 });
