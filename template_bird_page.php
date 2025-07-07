@@ -1,31 +1,22 @@
-<?php
-/**
- * Template Bird Page - Used by bird.php to create static pages per species
- * Variables expected:
- * - $species_common_name
- * - $scientific_name
- * - $external_link
- */
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sightings and data for <?php echo htmlspecialchars(\$species_common_name); ?> at Davidson Farm Bird Project.">
-  <title><?php echo htmlspecialchars(\$species_common_name); ?> | Davidson Farm Bird Project</title>
+  <meta name="description" content="Sightings and data for {{common_name}} at Davidson Farm Bird Project.">
+  <title>{{common_name}} | Davidson Farm Bird Project</title>
   <link href="/dashboard/css/tailwind.min.css" rel="stylesheet">
 </head>
 <body class="bg-white text-gray-800">
   <div class="max-w-4xl mx-auto p-6">
     <a href="/dashboard/species.html" class="text-sm text-blue-600 hover:underline">&larr; Back to Species List</a>
 
-    <h1 class="text-3xl font-serif mt-4 mb-2"><?php echo htmlspecialchars(\$species_common_name); ?></h1>
-    <p class="text-gray-600 italic mb-6"><?php echo htmlspecialchars(\$scientific_name); ?></p>
+    <h1 class="text-3xl font-serif mt-4 mb-2">{{common_name}}</h1>
+    <p class="text-gray-600 italic mb-6">{{sci_name}}</p>
 
     <p class="mb-4">
       Learn more at:
-      <a href="<?php echo htmlspecialchars(\$external_link); ?>" class="text-blue-600 underline" target="_blank">
+      <a href="{{aab_url}}" class="text-blue-600 underline" target="_blank">
         Cornell Lab of Ornithology — All About Birds
       </a>
     </p>
