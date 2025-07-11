@@ -23,7 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Fetch updated stats
   function fetchStats() {
-    fetch('php/stats.php')
+    const station = document.getElementById('stationSelect')?.value || '';
+    const formData = new FormData();
+    if (station && station !== 'All') {
+      formData.append('station', station);
+    }
+
+    fetch('php/stats.php', {
+      method: 'POST',
+      body: formData
+    })
       .then(response => response.json())
       .then(data => {
         console.log("DEBUG: stats.php returned →", data);
@@ -33,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (lastUpdatedSightings && data.last_updated) {
             const localDate = new Date(data.last_updated.replace(' ', 'T'));
-            console.log("DEBUG: local parsed date →", localDate);
 
             const localTime = localDate.toLocaleTimeString('en-US', {
               hour: '2-digit',
@@ -42,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
               timeZoneName: 'short'
             });
 
-            console.log("DEBUG: formatted localTime →", localTime);
             lastUpdatedSightings.textContent = 'Last updated at ' + localTime;
           } else {
             console.warn("Missing last_updated field in data");
@@ -105,6 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchYesterdaySpecies(initialConfYesterday);
   }
 
+  // Initial fetch
   fetchStats();
+
+  // Also update when station changes
+  const stationSelect = document.getElementById('stationSelect');
+  if (stationSelect) {
+    stationSelect.addEventListener('change', () => {
+      fetchStats();
+    });
+  }
 });
 
