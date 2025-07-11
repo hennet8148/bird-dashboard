@@ -5,6 +5,7 @@ require_once 'config.php';
 
 $bird = $_GET['bird'] ?? '';
 $timeRange = $_GET['timerange'] ?? 'last_hour';
+$station_id = $_GET['station'] ?? '';  // ✅ Added line
 
 if (!$bird) {
     echo json_encode([]);
