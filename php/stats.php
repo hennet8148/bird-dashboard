@@ -16,6 +16,10 @@ try {
     $lastUpdatedStmt = $pdo->query("SELECT MAX(timestamp) FROM sightings WHERE timestamp IS NOT NULL $whereStation");
     $lastUpdated = $lastUpdatedStmt->fetchColumn() ?: null;
 
+    // First recorded detection (filtered)
+    $firstDateStmt = $pdo->query("SELECT MIN(timestamp) FROM sightings WHERE timestamp IS NOT NULL $whereStation");
+    $firstDate = $firstDateStmt->fetchColumn() ?: null;
+
     // Unique species by confidence thresholds for yesterday
     $yesterday = date('Y-m-d', strtotime('-1 day'));
     $thresholds = [0.5, 0.4, 0.3];
@@ -41,7 +45,8 @@ try {
         'total_sightings' => $totalSightings,
         'total_species' => $totalSpecies,
         'yesterday_species' => $speciesCounts,
-        'last_updated' => $lastUpdated
+        'last_updated' => $lastUpdated,
+        'first_date' => $firstDate
     ]);
 
 } catch (PDOException $e) {
