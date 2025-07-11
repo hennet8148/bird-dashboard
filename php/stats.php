@@ -5,20 +5,35 @@ require_once 'config.php'; // gets $station
 
 $whereStation = $station ? " AND location = " . $pdo->quote($station) : "";
 
+// Default to S1 table
+$table = 'sightings';
+
+// If station explicitly passed as S2, switch table
+if (isset($station) && strtoupper($station) === 'S2') {
+    $table = 'sightings_s2';
+}
+
 try {
-    // Total sightings (optionally filtered by station)
-    $totalSightings = $pdo->query("SELECT COUNT(*) FROM sightings WHERE 1=1 $whereStation")->fetchColumn();
+    // Total sightings
+    $totalSightings = $pdo->query("SELECT COUNT(*) FROM $table")->fetchColumn();
 
-    // Total unique species (optionally filtered by station)
-    $totalSpecies = $pdo->query("SELECT COUNT(DISTINCT species_common_name) FROM sightings WHERE 1=1 $whereStation")->fetchColumn();
+    // Total unique species
+    $totalSpecies = $pdo->query("SELECT COUNT(DISTINCT species_common_name) FROM $table")->fetchColumn();
 
-    // Most recent detection (filtered)
-    $lastUpdatedStmt = $pdo->query("SELECT MAX(timestamp) FROM sightings WHERE timestamp IS NOT NULL $whereStation");
+    // Most recent detection
+    $lastUpdatedStmt = $pdo->query("SELECT MAX(timestamp) FROM $table WHERE timestamp IS NOT NULL");
     $lastUpdated = $lastUpdatedStmt->fetchColumn() ?: null;
 
-    // First recorded detection (filtered)
-    $firstDateStmt = $pdo->query("SELECT MIN(timestamp) FROM sightings WHERE timestamp IS NOT NULL $whereStation");
-    $firstDate = $firstDateStmt->fetchColumn() ?: null;
+    // First detection: use station_codes.start_date if available
+    $firstDate = '2025-06-24'; // default fallback
+    if ($station) {
+        $stmt = $pdo->prepare("SELECT start_date FROM station_codes WHERE station_id = :station_id");
+        $stmt->execute(['station_id' => $station]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result && !empty($result['start_date'])) {
+            $firstDate = $result['start_date'];
+        }
+    }
 
     // Unique species by confidence thresholds for yesterday
     $yesterday = date('Y-m-d', strtotime('-1 day'));
@@ -28,10 +43,9 @@ try {
     foreach ($thresholds as $t) {
         $sql = "
             SELECT COUNT(DISTINCT species_common_name)
-            FROM sightings
+            FROM $table
             WHERE confidence >= :conf
               AND DATE(timestamp) = :yesterday
-              $whereStation
         ";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([

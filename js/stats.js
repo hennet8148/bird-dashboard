@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const statSpecies = document.getElementById('statSpecies');
   const statYesterday = document.getElementById('statYesterday');
   const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
+  const sightingsTitle = document.getElementById('sightingsTitle');
 
   const confSlider = document.getElementById('confSlider');
   const confValue = document.getElementById('confValue');
@@ -39,6 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data) {
           statSightings.textContent = data.total_sightings ?? '—';
+
+          if (sightingsTitle && data.first_date) {
+            sightingsTitle.textContent = `Total Detections since ${data.first_date}`;
+          }
 
           if (lastUpdatedSightings && data.last_updated) {
             const localDate = new Date(data.last_updated.replace(' ', 'T'));
