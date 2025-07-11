@@ -1,6 +1,6 @@
 <?php
-// get_species_data.php
 require_once 'db.php';
+require_once 'config.php';
 
 header('Content-Type: application/json');
 
@@ -12,19 +12,28 @@ if (!$name) {
 }
 
 try {
-    $stmt = $pdo->prepare("
+    $sql = "
         SELECT timestamp, confidence
         FROM sightings
         WHERE species_common_name = :name
-        ORDER BY timestamp DESC
-        LIMIT 100
-    ");
-    $stmt->execute(['name' => $name]);
+    ";
+
+    $params = [':name' => $name];
+
+    if (!empty($station_id)) {
+        $sql .= " AND location = :station_id";
+        $params[':station_id'] = $station_id;
+    }
+
+    $sql .= " ORDER BY timestamp DESC LIMIT 100";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     echo json_encode($data);
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Database error']);
 }
-?>
 
