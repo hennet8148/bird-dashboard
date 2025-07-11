@@ -52,7 +52,17 @@
 
   <!-- Controls -->
   <section class="bg-white shadow mt-4 p-4">
-    <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Station Selector -->
+      <div>
+        <label for="stationSelect" class="block text-sm font-medium text-gray-700">Station</label>
+        <select id="stationSelect" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <option value="">All Stations</option>
+          <option value="S1">Station 1</option>
+          <option value="S2">Station 2</option>
+        </select>
+      </div>
+
       <!-- Bird Selector -->
       <div>
         <label for="birdSelect" class="block text-sm font-medium text-gray-700">Select Bird</label>
@@ -78,48 +88,33 @@
   <!-- Summary Stats -->
   <section class="container mx-auto mt-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-<!-- Total Sightings -->
-<div class="bg-white p-4 rounded shadow text-center">
-  <p class="text-sm text-gray-500">Total Sightings since 06/24/2025</p>
-  <p id="statSightings" class="text-2xl font-bold mt-2">—</p>
+      <!-- Total Sightings -->
+      <div class="bg-white p-4 rounded shadow text-center">
+        <p class="text-sm text-gray-500">Total Sightings since 06/24/2025</p>
+        <p id="statSightings" class="text-2xl font-bold mt-2">—</p>
 
-  <!-- Divider -->
-  <div class="my-4 flex justify-center">
-    <div class="w-3/4 border-t border-gray-300"></div>
-  </div>
+        <!-- Divider -->
+        <div class="my-4 flex justify-center">
+          <div class="w-3/4 border-t border-gray-300"></div>
+        </div>
 
-  <!-- Timestamp -->
-  <p id="lastUpdatedSightings" class="text-sm text-gray-500">Last updated at —</p>
-</div>
+        <!-- Timestamp -->
+        <p id="lastUpdatedSightings" class="text-sm text-gray-500">Last updated at —</p>
+      </div>
 
       <!-- Unique Species -->
       <div class="bg-white p-4 rounded shadow text-center">
         <p class="text-sm text-gray-500">Unique Species to date</p>
         <p id="statSpecies" class="text-2xl font-bold">—</p>
 
-        <!-- Toggle Button -->
-        <button id="toggleSpeciesList" class="text-sm text-blue-600 hover:underline mt-2">
-          Show List ▼
-        </button>
+        <button id="toggleSpeciesList" class="text-sm text-blue-600 hover:underline mt-2">Show List ▼</button>
 
-        <!-- Hidden Collapsible List -->
         <div id="speciesListContainer" class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700">
-          <ul id="speciesList" class="list-disc list-inside space-y-1 px-4 text-left">
-            <!-- Species will be dynamically inserted here -->
-          </ul>
+          <ul id="speciesList" class="list-disc list-inside space-y-1 px-4 text-left"></ul>
         </div>
 
-        <!-- Confidence Slider -->
         <label for="confSlider" class="block text-sm font-medium mt-4 text-gray-700">Confidence Threshold</label>
-        <input
-          type="range"
-          id="confSlider"
-          min="0"
-          max="1"
-          step="0.01"
-          value="0.5"
-          class="w-full mt-1"
-        />
+        <input type="range" id="confSlider" min="0" max="1" step="0.01" value="0.5" class="w-full mt-1" />
         <span id="confValue" class="text-sm text-gray-600">0.50</span>
       </div>
 
@@ -128,29 +123,14 @@
         <p class="text-sm text-gray-500">Unique Species — Previous Day</p>
         <p id="statYesterday" class="text-2xl font-bold">—</p>
 
-        <!-- Toggle Button -->
-        <button id="toggleSpeciesListYesterday" class="text-sm text-blue-600 hover:underline mt-2">
-          Show List ▼
-        </button>
+        <button id="toggleSpeciesListYesterday" class="text-sm text-blue-600 hover:underline mt-2">Show List ▼</button>
 
-        <!-- Hidden Collapsible List -->
         <div id="speciesListContainerYesterday" class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700">
-          <ul id="speciesListYesterday" class="list-disc list-inside space-y-1 px-4 text-left">
-            <!-- Yesterday species will be dynamically inserted here -->
-          </ul>
+          <ul id="speciesListYesterday" class="list-disc list-inside space-y-1 px-4 text-left"></ul>
         </div>
 
-        <!-- Confidence Slider -->
         <label for="confSliderYesterday" class="block text-sm font-medium mt-2 text-gray-700">Confidence Threshold</label>
-        <input
-          type="range"
-          id="confSliderYesterday"
-          min="0"
-          max="1"
-          step="0.01"
-          value="0.5"
-          class="w-full mt-1"
-        />
+        <input type="range" id="confSliderYesterday" min="0" max="1" step="0.01" value="0.5" class="w-full mt-1" />
         <span id="confValueYesterday" class="text-sm text-gray-600">0.50</span>
       </div>
     </div>
