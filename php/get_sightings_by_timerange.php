@@ -4,9 +4,15 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 require_once 'db.php';
+require_once 'config.php'; // for debug_log()
 
 $timeRange = $_GET['timerange'] ?? 'last_hour';
+$station = $_GET['station'] ?? null;
 
+// Debug log incoming parameters
+debug_log("get_sightings_by_timerange.php → timerange = $timeRange, station = " . ($station ?? 'NULL'));
+
+// Time filter logic
 switch ($timeRange) {
     case 'last_hour':
         $timeCondition = "s.timestamp >= NOW() - INTERVAL 1 HOUR";
@@ -27,6 +33,16 @@ switch ($timeRange) {
         $timeCondition = "s.timestamp >= NOW() - INTERVAL 1 HOUR";
 }
 
+$params = [];
+
+// Station filter logic
+if ($station && in_array($station, ['S1', 'S2'])) {
+    $stationCondition = "AND s.location = :station";
+    $params[':station'] = $station;
+} else {
+    $stationCondition = "";
+}
+
 $sql = "
     SELECT 
         sc.species_code,
@@ -38,13 +54,14 @@ $sql = "
     INNER JOIN species_codes sc
         ON TRIM(LOWER(s.species_common_name)) = TRIM(LOWER(sc.species_common_name))
     WHERE $timeCondition
+    $stationCondition
     GROUP BY s.species_common_name, sc.species_code
     ORDER BY sightings_count DESC
     LIMIT 100
 ";
 
 $stmt = $pdo->prepare($sql);
-$stmt->execute();
+$stmt->execute($params);
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo json_encode($results);
