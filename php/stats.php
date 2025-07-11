@@ -22,8 +22,14 @@ try {
     $totalSpecies = $pdo->query("SELECT COUNT(DISTINCT species_common_name) FROM $table")->fetchColumn();
 
     // Most recent detection
-    $lastUpdatedStmt = $pdo->query("SELECT MAX(timestamp) FROM $table WHERE timestamp IS NOT NULL");
-    $lastUpdated = $lastUpdatedStmt->fetchColumn() ?: null;
+    $lastUpdated = null;
+    if ($station && strtoupper($station) === 'S2') {
+        $stmt = $pdo->query("SELECT MAX(timestamp) FROM sightings_s2 WHERE timestamp IS NOT NULL");
+        $lastUpdated = $stmt->fetchColumn();
+    } else {
+        $stmt = $pdo->query("SELECT MAX(timestamp) FROM sightings WHERE timestamp IS NOT NULL");
+        $lastUpdated = $stmt->fetchColumn();
+    }
 
     // First detection: use station_codes.start_date if available
     $firstDate = '2025-06-24'; // default fallback
