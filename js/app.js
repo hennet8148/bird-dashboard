@@ -140,6 +140,48 @@ function fetchSightingsByBird(bird, timeRange, station = '') {
     });
 }
 
+// NEW: Total sightings block update
+function updateTotalSightings(station = '') {
+  const url = 'php/stats.php';
+  const formData = new FormData();
+  if (station && station !== 'All') {
+    formData.append('station', station);
+  }
+
+  fetch(url, {
+    method: 'POST',
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('totalSightings');
+      if (!container) return;
+
+      const startDate = new Date(data.first_date).toLocaleDateString();
+      const lastTime = new Date(data.last_updated).toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short'
+      });
+
+      container.innerHTML = `
+        <div class="text-sm text-gray-500 text-center mb-1">
+          Total Sightings since ${startDate}
+        </div>
+        <div class="text-3xl font-bold text-center">
+          ${data.total_sightings.toLocaleString()}
+        </div>
+        <hr class="my-2">
+        <div class="text-sm text-gray-500 text-center">
+          Last updated at ${lastTime}
+        </div>
+      `;
+    })
+    .catch(err => {
+      console.error('Error fetching total sightings:', err);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const birdSelect = document.getElementById('birdSelect');
   const timeRangeSelect = document.getElementById('timeRange');
@@ -161,10 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (birdSelect && timeRangeSelect && stationSelect && dataExplorer) {
     birdSelect.addEventListener('change', updateDataExplorer);
     timeRangeSelect.addEventListener('change', updateDataExplorer);
-    stationSelect.addEventListener('change', updateDataExplorer);
+    stationSelect.addEventListener('change', () => {
+      updateDataExplorer();
+      updateTotalSightings(stationSelect.value); // Refresh applet
+    });
 
     fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
-    updateDataExplorer(); // Load initial data
+    updateDataExplorer(); // Load table
+    updateTotalSightings(stationSelect.value); // Load initial applet
   }
 });
 
