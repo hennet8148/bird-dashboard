@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
   const sightingsTitle = document.getElementById('sightingsTitle');
 
+
   const confSlider = document.getElementById('confSlider');
   const confValue = document.getElementById('confValue');
   const confSliderYesterday = document.getElementById('confSliderYesterday');
