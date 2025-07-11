@@ -2,9 +2,21 @@
 header('Content-Type: application/json');
 
 require_once 'db.php';
+require_once 'config.php';
 
 try {
-    $stmt = $pdo->query("SELECT DISTINCT species_common_name FROM sightings ORDER BY species_common_name ASC");
+    $sql = "SELECT DISTINCT species_common_name FROM sightings";
+    $params = [];
+
+    if (!empty($station_id)) {
+        $sql .= " WHERE location = :station_id";
+        $params[':station_id'] = $station_id;
+    }
+
+    $sql .= " ORDER BY species_common_name ASC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
     $species = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
     echo json_encode($species);
