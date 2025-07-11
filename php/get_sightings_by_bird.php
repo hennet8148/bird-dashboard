@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once 'db.php';
+require_once 'config.php';
 
 $bird = $_GET['bird'] ?? '';
 $timeRange = $_GET['timerange'] ?? 'last_hour';
@@ -30,15 +31,24 @@ switch ($timeRange) {
         $timeCondition = "timestamp >= NOW() - INTERVAL 1 HOUR";
 }
 
-$stmt = $pdo->prepare("
+$sql = "
     SELECT timestamp, confidence
     FROM sightings
-    WHERE species_common_name = :bird AND $timeCondition
-    ORDER BY timestamp DESC
-    LIMIT 1000
-");
+    WHERE species_common_name = :bird
+      AND $timeCondition
+";
 
-$stmt->execute(['bird' => $bird]);
+$params = [':bird' => $bird];
+
+if (!empty($station_id)) {
+    $sql .= " AND location = :station_id";
+    $params[':station_id'] = $station_id;
+}
+
+$sql .= " ORDER BY timestamp DESC LIMIT 1000";
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 echo json_encode($results);
