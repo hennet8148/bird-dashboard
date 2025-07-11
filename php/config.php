@@ -1,5 +1,6 @@
 <?php
 // php/config.php
+$station = $_POST['station'] ?? $_GET['station'] ?? null;
 
 // Toggle this to enable/disable debug output globally
 define('DEBUG_MODE', true);
