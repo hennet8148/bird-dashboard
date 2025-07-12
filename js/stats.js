@@ -66,6 +66,7 @@ const confSlider = document.getElementById('confSlider');
 const confValue = document.getElementById('confValue');
 const confSliderYesterday = document.getElementById('confSliderYesterday');
 const confValueYesterday = document.getElementById('confValueYesterday');
+const stationSelect = document.getElementById('stationSelect');
 
 // Clear saved values on initial load
 localStorage.removeItem('confSlider');
@@ -81,9 +82,17 @@ if (confSliderYesterday && confValueYesterday) {
   confValueYesterday.textContent = '0.50';
 }
 
+function getSelectedStation() {
+  const stationSelect = document.getElementById('stationSelect');
+  return stationSelect ? stationSelect.value : 'All';
+}
+
 function fetchUniqueSpecies(conf) {
   const statSpecies = document.getElementById('statSpecies');
-  fetch(`php/get_unique_species.php?conf=${conf}`)
+  const station = getSelectedStation();
+  const params = new URLSearchParams({ conf, station });
+
+  fetch(`php/get_unique_species.php?${params.toString()}`)
     .then(r => r.json())
     .then(data => {
       if (statSpecies) {
@@ -98,7 +107,10 @@ function fetchUniqueSpecies(conf) {
 
 function fetchYesterdaySpecies(conf) {
   const statYesterday = document.getElementById('statYesterday');
-  fetch(`php/get_yesterday_species.php?conf=${conf}`)
+  const station = getSelectedStation();
+  const params = new URLSearchParams({ conf, station });
+
+  fetch(`php/get_yesterday_species.php?${params.toString()}`)
     .then(r => r.json())
     .then(data => {
       if (statYesterday) {
@@ -129,6 +141,17 @@ if (confSliderYesterday && confValueYesterday) {
     fetchYesterdaySpecies(val);
   });
   fetchYesterdaySpecies(0.5);
+}
+
+// Re-run stats when station changes
+if (stationSelect) {
+  stationSelect.addEventListener('change', () => {
+    const val1 = parseFloat(confSlider?.value ?? 0.5);
+    const val2 = parseFloat(confSliderYesterday?.value ?? 0.5);
+    fetchUniqueSpecies(val1);
+    fetchYesterdaySpecies(val2);
+    updateStatsPanel();
+  });
 }
 
 // Initial load
