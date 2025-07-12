@@ -72,6 +72,7 @@ function fetchUniqueSpecies(conf) {
   fetch(`php/get_unique_species.php?${params.toString()}`)
     .then(r => r.json())
     .then(data => {
+      console.log(`[DEBUG] fetchUniqueSpecies(conf=${conf}, station=${station}) returned →`, data.count);
       if (statSpecies) {
         statSpecies.textContent = data.count ?? '—';
         statSpecies.classList.add('text-2xl', 'font-bold', 'text-black');
@@ -152,9 +153,26 @@ if (stationSelect) {
   });
 }
 
-// ✅ Initial load with selected station
-const defaultStation = getSelectedStation();
-updateStatsPanel(defaultStation);
-fetchUniqueSpecies(0.5);
-fetchYesterdaySpecies(0.5);
+// ✅ Initial load with debug logging
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const defaultStation = getSelectedStation();
+    console.log('[DEBUG] Delayed load, station:', defaultStation);
+
+    updateStatsPanel(defaultStation);
+
+    fetch(`php/get_unique_species.php?conf=0.5&station=${defaultStation}`)
+      .then(r => r.json())
+      .then(data => {
+        console.log(`[DEBUG] Unique species at 0.5 for ${defaultStation}:`, data.count);
+        const statSpecies = document.getElementById('statSpecies');
+        if (statSpecies) {
+          statSpecies.textContent = data.count ?? '—';
+          statSpecies.classList.add('text-2xl', 'font-bold', 'text-black');
+        }
+      });
+
+    fetchYesterdaySpecies(0.5);
+  }, 100);
+});
 
