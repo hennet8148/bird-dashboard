@@ -154,18 +154,3 @@ if (stationSelect) {
   });
 }
 
-// ✅ Safe load: Wait for station to be populated before fetching
-window.addEventListener('DOMContentLoaded', () => {
-  const waitForStation = setInterval(() => {
-    const station = getSelectedStation();
-    if (station && station !== '') {
-      clearInterval(waitForStation);
-      console.log(`[DEBUG] Station detected on load → "${station}"`);
-
-      updateStatsPanel(station);
-      fetchUniqueSpecies(0.5, station);
-      fetchYesterdaySpecies(0.5, station);
-    }
-  }, 50); // retry every 50ms
-});
-
