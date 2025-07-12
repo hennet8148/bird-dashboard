@@ -1,3 +1,5 @@
+import { updateStatsPanel } from './stats.js'; // ✅ Add this line
+
 // Helper to create sortable table headers
 function createSortableHeader(text, key, currentSort, setSort) {
   const th = document.createElement('th');
@@ -140,7 +142,6 @@ function fetchSightingsByBird(bird, timeRange, station = '') {
     });
 }
 
-// NEW: Total sightings block update
 function updateTotalSightings(station = '') {
   const url = 'php/stats.php';
   const formData = new FormData();
@@ -204,13 +205,18 @@ document.addEventListener('DOMContentLoaded', () => {
     birdSelect.addEventListener('change', updateDataExplorer);
     timeRangeSelect.addEventListener('change', updateDataExplorer);
     stationSelect.addEventListener('change', () => {
+      const station = stationSelect.value;
       updateDataExplorer();
-      updateTotalSightings(stationSelect.value); // Refresh applet
+      updateTotalSightings(station);
+      updateStatsPanel(station); // ✅ NEW
     });
 
     fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
-    updateDataExplorer(); // Load table
-    updateTotalSightings(stationSelect.value); // Load initial applet
+
+    const station = stationSelect.value;
+    updateDataExplorer();
+    updateTotalSightings(station);
+    updateStatsPanel(station); // ✅ NEW
   }
 });
 
