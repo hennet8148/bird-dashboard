@@ -5,34 +5,21 @@ require_once 'db.php';
 require_once 'config.php'; // gets $station
 
 $whereStation = $station ? " AND location = " . $pdo->quote($station) : "";
-
-// Default to S1 table
 $table = 'sightings';
-
-// If station explicitly passed as S2, switch table
-if (isset($station) && strtoupper($station) === 'S2') {
-    $table = 'sightings_s2';
-}
 
 try {
     // Total sightings
-    $totalSightings = $pdo->query("SELECT COUNT(*) FROM $table")->fetchColumn();
+    $totalSightings = $pdo->query("SELECT COUNT(*) FROM $table WHERE 1=1 $whereStation")->fetchColumn();
 
     // Total unique species
-    $totalSpecies = $pdo->query("SELECT COUNT(DISTINCT species_common_name) FROM $table")->fetchColumn();
+    $totalSpecies = $pdo->query("SELECT COUNT(DISTINCT species_common_name) FROM $table WHERE 1=1 $whereStation")->fetchColumn();
 
     // Most recent detection
-    $lastUpdated = null;
-    if ($station && strtoupper($station) === 'S2') {
-        $stmt = $pdo->query("SELECT MAX(timestamp) FROM sightings_s2 WHERE timestamp IS NOT NULL");
-        $lastUpdated = $stmt->fetchColumn();
-    } else {
-        $stmt = $pdo->query("SELECT MAX(timestamp) FROM sightings WHERE timestamp IS NOT NULL");
-        $lastUpdated = $stmt->fetchColumn();
-    }
+    $stmt = $pdo->query("SELECT MAX(timestamp) FROM $table WHERE timestamp IS NOT NULL $whereStation");
+    $lastUpdated = $stmt->fetchColumn();
 
     // First detection: use station_codes.start_date if available
-    $firstDate = '2025-06-24'; // default fallback
+    $firstDate = '2025-06-24'; // fallback
     if ($station) {
         $stmt = $pdo->prepare("SELECT start_date FROM station_codes WHERE station_id = :station_id");
         $stmt->execute(['station_id' => $station]);
@@ -53,6 +40,7 @@ try {
             FROM $table
             WHERE confidence >= :conf
               AND DATE(timestamp) = :yesterday
+              $whereStation
         ";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
