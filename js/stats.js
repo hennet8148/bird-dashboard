@@ -29,7 +29,7 @@ if (confSliderYesterday && confValueYesterday) {
 }
 
 // Reusable fetch for stats block
-export function updateStatsPanel(passedStation = '') {
+function updateStatsPanel(passedStation = '') {
   // If no station passed, try DOM
   let station = passedStation;
   if (!station) {
@@ -85,6 +85,9 @@ export function updateStatsPanel(passedStation = '') {
       if (lastUpdatedSightings) lastUpdatedSightings.textContent = 'Last updated at —';
     });
 }
+
+// Expose globally for app.js
+window.updateStatsPanel = updateStatsPanel;
 
 function fetchUniqueSpecies(conf) {
   fetch(`php/get_unique_species.php?conf=${conf}`)
