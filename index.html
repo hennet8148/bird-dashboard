@@ -1,148 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bird Monitor – BirdNET-Powered Acoustic Monitoring on a Pennsylvania Farm</title>
+<!-- Replace this block in your index.html -->
 
-  <!-- SEO Meta -->
-  <meta name="description" content="Bird Monitor is a fully autonomous bird acoustic monitoring system powered by BirdNET. Deployed on a 100-acre farm in northeastern Pennsylvania, it identifies species by sound and stores them in a searchable database." />
-  <meta name="keywords" content="BirdNET, bird monitoring, acoustic monitoring, Raspberry Pi, bird sound recognition, northeastern Pennsylvania, bird species detection, farm biodiversity, open-source ecology, BirdNET Pi, bird database" />
-  <meta name="author" content="Hard Times Bird Monitor" />
-
-  <!-- Social Sharing -->
-  <meta property="og:title" content="Bird Monitor – BirdNET-Powered Monitoring on a 100-Acre Farm" />
-  <meta property="og:description" content="A fully autonomous, open-source bird acoustic monitoring project using BirdNET on a 100-acre Pennsylvania farm." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://yoursite.com" />
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Bird Monitor – BirdNET-Powered Monitoring on a 100-Acre Farm" />
-  <meta name="twitter:description" content="Real-time acoustic bird monitoring using BirdNET on a northeastern PA farm." />
-
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-
-<body class="bg-gray-100 font-sans">
-  <!-- Header -->
-  <header class="bg-white shadow p-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-2xl font-bold text-gray-800">Bird Monitor</h1>
-      <nav class="space-x-4 text-sm text-gray-600">
-        <a href="index.html" class="hover:text-black font-semibold">Dashboard</a>
-        <a href="about.html" class="hover:text-black">About</a>
-        <a href="how-it-works.html" class="hover:text-black">How It Works</a>
-      </nav>
+<!-- Summary Stats -->
+<section class="container mx-auto mt-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Total Sightings (now dynamic) -->
+    <div id="statSightings" class="bg-white p-4 rounded shadow text-center">
+      <p id="sightingsTitle" class="text-sm text-gray-500">Total Detections</p>
+      <p id="statSightingsValue" class="text-2xl font-bold">—</p>
+      <p id="lastUpdatedSightings" class="text-xs text-gray-400 mt-1">Last updated at —</p>
     </div>
-  </header>
 
-  <!-- Project Overview Block -->
-  <section class="bg-white shadow p-6 mb-4">
-    <div class="container mx-auto max-w-4xl text-center">
-      <p class="text-gray-700 text-base md:text-lg leading-relaxed">
-        <strong>Bird Monitor</strong> is a fully autonomous bird acoustic monitoring system 
-        built using Raspberry Pi, BirdNET, and open-source tools. It continuously identifies bird 
-        species by sound and stores results in a searchable database. The project is based on a 
-        100-acre farm in northeastern Pennsylvania, where diverse forest and field habitats support 
-        a rich and evolving soundscape.
-      </p>
+    <!-- Unique Species -->
+    <div class="bg-white p-4 rounded shadow text-center">
+      <p class="text-sm text-gray-500">Unique Species to date</p>
+      <p id="statSpecies" class="text-2xl font-bold">—</p>
+
+      <button id="toggleSpeciesList" class="text-sm text-blue-600 hover:underline mt-2">Show List ▼</button>
+
+      <div id="speciesListContainer" class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700">
+        <ul id="speciesList" class="list-disc list-inside space-y-1 px-4 text-left"></ul>
+      </div>
+
+      <label for="confSlider" class="block text-sm font-medium mt-4 text-gray-700">Confidence Threshold</label>
+      <input type="range" id="confSlider" min="0" max="1" step="0.01" value="0.5" class="w-full mt-1" />
+      <span id="confValue" class="text-sm text-gray-600">0.50</span>
     </div>
-  </section>
 
-  <!-- Controls -->
-  <section class="bg-white shadow mt-4 p-4">
-    <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Station Selector -->
-      <div>
-        <label for="stationSelect" class="block text-sm font-medium text-gray-700">Station</label>
-        <select id="stationSelect" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-          <option value="">All Stations</option>
-          <option value="S1">Station 1</option>
-          <option value="S2">Station 2</option>
-        </select>
+    <!-- Yesterday Unique Species -->
+    <div class="bg-white p-4 rounded shadow text-center">
+      <p class="text-sm text-gray-500">Unique Species — Previous Day</p>
+      <p id="statYesterday" class="text-2xl font-bold">—</p>
+
+      <button id="toggleSpeciesListYesterday" class="text-sm text-blue-600 hover:underline mt-2">Show List ▼</button>
+
+      <div id="speciesListContainerYesterday" class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700">
+        <ul id="speciesListYesterday" class="list-disc list-inside space-y-1 px-4 text-left"></ul>
       </div>
 
-      <!-- Bird Selector -->
-      <div>
-        <label for="birdSelect" class="block text-sm font-medium text-gray-700">Select Bird</label>
-        <select id="birdSelect" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-          <option value="">-- Choose a bird --</option>
-        </select>
-      </div>
-
-      <!-- Time Selector -->
-      <div>
-        <label for="timeRange" class="block text-sm font-medium text-gray-700">Time Range</label>
-        <select id="timeRange" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
-          <option value="last_hour">Last Hour</option>
-          <option value="today">Today</option>
-          <option value="yesterday">Yesterday</option>
-          <option value="last_week">Last 7 Days</option>
-          <option value="last_month">Last 30 Days</option>
-        </select>
-      </div>
+      <label for="confSliderYesterday" class="block text-sm font-medium mt-2 text-gray-700">Confidence Threshold</label>
+      <input type="range" id="confSliderYesterday" min="0" max="1" step="0.01" value="0.5" class="w-full mt-1" />
+      <span id="confValueYesterday" class="text-sm text-gray-600">0.50</span>
     </div>
-  </section>
-
-  <!-- Summary Stats -->
-  <section class="container mx-auto mt-6">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <!-- Total Sightings (now dynamic) -->
-      <div id="totalSightings" class="bg-white p-4 rounded shadow text-center">
-        <!-- Populated by JS -->
-      </div>
-
-      <!-- Unique Species -->
-      <div class="bg-white p-4 rounded shadow text-center">
-        <p class="text-sm text-gray-500">Unique Species to date</p>
-        <p id="statSpecies" class="text-2xl font-bold">—</p>
-
-        <button id="toggleSpeciesList" class="text-sm text-blue-600 hover:underline mt-2">Show List ▼</button>
-
-        <div id="speciesListContainer" class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700">
-          <ul id="speciesList" class="list-disc list-inside space-y-1 px-4 text-left"></ul>
-        </div>
-
-        <label for="confSlider" class="block text-sm font-medium mt-4 text-gray-700">Confidence Threshold</label>
-        <input type="range" id="confSlider" min="0" max="1" step="0.01" value="0.5" class="w-full mt-1" />
-        <span id="confValue" class="text-sm text-gray-600">0.50</span>
-      </div>
-
-      <!-- Yesterday Unique Species -->
-      <div class="bg-white p-4 rounded shadow text-center">
-        <p class="text-sm text-gray-500">Unique Species — Previous Day</p>
-        <p id="statYesterday" class="text-2xl font-bold">—</p>
-
-        <button id="toggleSpeciesListYesterday" class="text-sm text-blue-600 hover:underline mt-2">Show List ▼</button>
-
-        <div id="speciesListContainerYesterday" class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700">
-          <ul id="speciesListYesterday" class="list-disc list-inside space-y-1 px-4 text-left"></ul>
-        </div>
-
-        <label for="confSliderYesterday" class="block text-sm font-medium mt-2 text-gray-700">Confidence Threshold</label>
-        <input type="range" id="confSliderYesterday" min="0" max="1" step="0.01" value="0.5" class="w-full mt-1" />
-        <span id="confValueYesterday" class="text-sm text-gray-600">0.50</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Content Area -->
-  <main class="container mx-auto mt-8">
-    <div class="bg-white p-6 rounded shadow">
-      <h2 class="text-lg font-semibold mb-4">Data Explorer</h2>
-      <div id="dataExplorerContent">
-        <p>Loading data...</p>
-      </div>
-    </div>
-  </main>
-
-
-  <!-- Scripts -->
-  <script src="js/stats.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/dropdown.js"></script>
-  <script src="js/speciesListToggle.js"></script>
-</body>
-</html>
+  </div>
+</section>
 
