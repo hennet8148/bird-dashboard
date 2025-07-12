@@ -42,30 +42,36 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(data => {
         console.log("DEBUG: stats.php returned →", data);
 
-        if (data) {
-          if (statSightings) statSightings.textContent = data.total_sightings ?? '—';
-          if (statSpecies) statSpecies.textContent = data.total_species ?? '—';
-          if (statYesterday && data.yesterday_species) {
-            const val = data.yesterday_species["0.5"] ?? '—';
-            statYesterday.textContent = val;
-          }
+        if (!data) return;
 
-          if (sightingsTitle && data.first_date) {
-            sightingsTitle.textContent = `Total Detections since ${data.first_date}`;
-          }
+        if (statSightings) {
+          statSightings.textContent = data.total_sightings ?? '—';
+        }
 
-          if (lastUpdatedSightings && data.last_updated) {
-            const localDate = new Date(data.last_updated.replace(' ', 'T'));
-            const localTime = localDate.toLocaleTimeString('en-US', {
-              hour: '2-digit',
-              minute: '2-digit',
-              timeZone: 'America/New_York',
-              timeZoneName: 'short'
-            });
-            lastUpdatedSightings.textContent = 'Last updated at ' + localTime;
-          } else if (lastUpdatedSightings) {
-            lastUpdatedSightings.textContent = 'Last updated at —';
-          }
+        if (statSpecies) {
+          statSpecies.textContent = data.total_species ?? '—';
+        }
+
+        if (statYesterday && data.yesterday_species) {
+          const confKey = (initialConfYesterday).toFixed(1); // e.g., "0.5"
+          statYesterday.textContent = data.yesterday_species[confKey] ?? '—';
+        }
+
+        if (sightingsTitle && data.first_date) {
+          sightingsTitle.textContent = `Total Detections since ${data.first_date}`;
+        }
+
+        if (lastUpdatedSightings && data.last_updated) {
+          const localDate = new Date(data.last_updated.replace(' ', 'T'));
+          const localTime = localDate.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+            timeZone: 'America/New_York',
+            timeZoneName: 'short'
+          });
+          lastUpdatedSightings.textContent = 'Last updated at ' + localTime;
+        } else if (lastUpdatedSightings) {
+          lastUpdatedSightings.textContent = 'Last updated at —';
         }
       })
       .catch(err => {
