@@ -5,26 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
   const sightingsTitle = document.getElementById('sightingsTitle');
 
-  const confSlider = document.getElementById('confSlider');
-  const confValue = document.getElementById('confValue');
-  const confSliderYesterday = document.getElementById('confSliderYesterday');
-  const confValueYesterday = document.getElementById('confValueYesterday');
-
-  // Clear saved values on initial load for fresh defaults
+  // Clear saved values on initial load
   localStorage.removeItem('confSlider');
   localStorage.removeItem('confSliderYesterday');
-
-  const initialConf = 0.5;
-  const initialConfYesterday = 0.5;
-
-  if (confSlider && confValue) {
-    confSlider.value = initialConf;
-    confValue.textContent = initialConf.toFixed(2);
-  }
-  if (confSliderYesterday && confValueYesterday) {
-    confSliderYesterday.value = initialConfYesterday;
-    confValueYesterday.textContent = initialConfYesterday.toFixed(2);
-  }
 
   function fetchStats() {
     const station = document.getElementById('stationSelect')?.value || '';
@@ -79,54 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   }
 
-  function fetchUniqueSpecies(conf) {
-    fetch(`php/get_unique_species.php?conf=${conf}`)
-      .then(r => r.json())
-      .then(data => {
-        if (statSpecies) {
-          statSpecies.textContent = data.count ?? '—';
-          statSpecies.classList.add('text-2xl', 'font-bold', 'text-black');
-        }
-      })
-      .catch(() => {
-        if (statSpecies) statSpecies.textContent = '—';
-      });
-  }
-
-  function fetchYesterdaySpecies(conf) {
-    fetch(`php/get_yesterday_species.php?conf=${conf}`)
-      .then(r => r.json())
-      .then(data => {
-        if (statYesterday) {
-          statYesterday.textContent = data.count ?? '—';
-          statYesterday.classList.add('text-2xl', 'font-bold', 'text-black');
-        }
-      })
-      .catch(() => {
-        if (statYesterday) statYesterday.textContent = '—';
-      });
-  }
-
-  if (confSlider && confValue) {
-    confSlider.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      confValue.textContent = val.toFixed(2);
-      localStorage.setItem('confSlider', val);
-      fetchUniqueSpecies(val);
-    });
-    fetchUniqueSpecies(initialConf);
-  }
-
-  if (confSliderYesterday && confValueYesterday) {
-    confSliderYesterday.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      confValueYesterday.textContent = val.toFixed(2);
-      localStorage.setItem('confSliderYesterday', val);
-      fetchYesterdaySpecies(val);
-    });
-    fetchYesterdaySpecies(initialConfYesterday);
-  }
-
+  // Initial load
   fetchStats();
 
   const stationSelect = document.getElementById('stationSelect');
