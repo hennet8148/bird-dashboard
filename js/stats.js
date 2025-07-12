@@ -1,41 +1,17 @@
 // stats.js
 
-const statSightings = document.getElementById('statSightings');
-const statSpecies = document.getElementById('statSpecies');
-const statYesterday = document.getElementById('statYesterday');
-const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
-const sightingsTitle = document.getElementById('sightingsTitle');
+export function updateStatsPanel(passedStation = '') {
+  const statSightings = document.getElementById('statSightings');
+  const statSpecies = document.getElementById('statSpecies');
+  const statYesterday = document.getElementById('statYesterday');
+  const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
+  const sightingsTitle = document.getElementById('sightingsTitle');
 
-const confSlider = document.getElementById('confSlider');
-const confValue = document.getElementById('confValue');
-const confSliderYesterday = document.getElementById('confSliderYesterday');
-const confValueYesterday = document.getElementById('confValueYesterday');
+  const initialConf = 0.5;
+  const initialConfYesterday = 0.5;
 
-const initialConf = 0.5;
-const initialConfYesterday = 0.5;
-
-// Clear saved values on initial load
-localStorage.removeItem('confSlider');
-localStorage.removeItem('confSliderYesterday');
-
-if (confSlider && confValue) {
-  confSlider.value = initialConf;
-  confValue.textContent = initialConf.toFixed(2);
-}
-
-if (confSliderYesterday && confValueYesterday) {
-  confSliderYesterday.value = initialConfYesterday;
-  confValueYesterday.textContent = initialConfYesterday.toFixed(2);
-}
-
-// Reusable fetch for stats block
-function updateStatsPanel(passedStation = '') {
-  // If no station passed, try DOM
-  let station = passedStation;
-  if (!station) {
-    const stationSelect = document.getElementById('stationSelect');
-    station = stationSelect ? stationSelect.value : '';
-  }
+  const stationSelect = document.getElementById('stationSelect');
+  let station = passedStation || (stationSelect ? stationSelect.value : '');
 
   const formData = new FormData();
   if (station && station !== 'All') {
@@ -86,10 +62,27 @@ function updateStatsPanel(passedStation = '') {
     });
 }
 
-// Expose globally for app.js
-window.updateStatsPanel = updateStatsPanel;
+const confSlider = document.getElementById('confSlider');
+const confValue = document.getElementById('confValue');
+const confSliderYesterday = document.getElementById('confSliderYesterday');
+const confValueYesterday = document.getElementById('confValueYesterday');
+
+// Clear saved values on initial load
+localStorage.removeItem('confSlider');
+localStorage.removeItem('confSliderYesterday');
+
+if (confSlider && confValue) {
+  confSlider.value = 0.5;
+  confValue.textContent = '0.50';
+}
+
+if (confSliderYesterday && confValueYesterday) {
+  confSliderYesterday.value = 0.5;
+  confValueYesterday.textContent = '0.50';
+}
 
 function fetchUniqueSpecies(conf) {
+  const statSpecies = document.getElementById('statSpecies');
   fetch(`php/get_unique_species.php?conf=${conf}`)
     .then(r => r.json())
     .then(data => {
@@ -104,6 +97,7 @@ function fetchUniqueSpecies(conf) {
 }
 
 function fetchYesterdaySpecies(conf) {
+  const statYesterday = document.getElementById('statYesterday');
   fetch(`php/get_yesterday_species.php?conf=${conf}`)
     .then(r => r.json())
     .then(data => {
@@ -124,7 +118,7 @@ if (confSlider && confValue) {
     localStorage.setItem('confSlider', val);
     fetchUniqueSpecies(val);
   });
-  fetchUniqueSpecies(initialConf);
+  fetchUniqueSpecies(0.5);
 }
 
 if (confSliderYesterday && confValueYesterday) {
@@ -134,9 +128,9 @@ if (confSliderYesterday && confValueYesterday) {
     localStorage.setItem('confSliderYesterday', val);
     fetchYesterdaySpecies(val);
   });
-  fetchYesterdaySpecies(initialConfYesterday);
+  fetchYesterdaySpecies(0.5);
 }
 
-// Initial stats fetch (defaults to stationSelect value)
+// Initial load
 updateStatsPanel();
 
