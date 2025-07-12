@@ -1,4 +1,4 @@
-import { updateStatsPanel } from './stats.js'; // ✅ Add this line
+import { updateStatsPanel, fetchUniqueSpecies, fetchYesterdaySpecies } from './stats.js'; // ✅ Updated
 
 // Helper to create sortable table headers
 function createSortableHeader(text, key, currentSort, setSort) {
@@ -208,17 +208,47 @@ document.addEventListener('DOMContentLoaded', () => {
       const station = stationSelect.value;
       updateDataExplorer();
       updateTotalSightings(station);
-      updateStatsPanel(station); // ✅ on station change
+      updateStatsPanel(station);
     });
 
     fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
 
-    // ✅ DEFERRED INITIALIZATION
     queueMicrotask(() => {
       const station = stationSelect.value;
       updateDataExplorer();
       updateTotalSightings(station);
-      updateStatsPanel(station); // ✅ prevent race condition on early empty station
+      updateStatsPanel(station);
+    });
+  }
+
+  // ✅ NEW SLIDER HOOKS
+  const confSlider = document.getElementById('confSlider');
+  const confValue = document.getElementById('confValue');
+  const confSliderYesterday = document.getElementById('confSliderYesterday');
+  const confValueYesterday = document.getElementById('confValueYesterday');
+
+  localStorage.removeItem('confSlider');
+  localStorage.removeItem('confSliderYesterday');
+
+  if (confSlider && confValue) {
+    confSlider.value = 0.5;
+    confValue.textContent = '0.50';
+    confSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      confValue.textContent = val.toFixed(2);
+      localStorage.setItem('confSlider', val);
+      fetchUniqueSpecies(val);
+    });
+  }
+
+  if (confSliderYesterday && confValueYesterday) {
+    confSliderYesterday.value = 0.5;
+    confValueYesterday.textContent = '0.50';
+    confSliderYesterday.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      confValueYesterday.textContent = val.toFixed(2);
+      localStorage.setItem('confSliderYesterday', val);
+      fetchYesterdaySpecies(val);
     });
   }
 });
