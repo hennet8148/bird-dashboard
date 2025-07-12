@@ -64,9 +64,8 @@ export function updateStatsPanel(passedStation = '') {
     });
 }
 
-function fetchUniqueSpecies(conf) {
+function fetchUniqueSpecies(conf, station = getSelectedStation()) {
   const statSpecies = document.getElementById('statSpecies');
-  const station = getSelectedStation();
   const params = new URLSearchParams({ conf, station });
 
   fetch(`php/get_unique_species.php?${params.toString()}`)
@@ -83,9 +82,8 @@ function fetchUniqueSpecies(conf) {
     });
 }
 
-function fetchYesterdaySpecies(conf) {
+function fetchYesterdaySpecies(conf, station = getSelectedStation()) {
   const statYesterday = document.getElementById('statYesterday');
-  const station = getSelectedStation();
   const params = new URLSearchParams({ conf, station });
 
   fetch(`php/get_yesterday_species.php?${params.toString()}`)
@@ -147,32 +145,21 @@ if (stationSelect) {
   stationSelect.addEventListener('change', () => {
     const val1 = parseFloat(confSlider?.value ?? 0.5);
     const val2 = parseFloat(confSliderYesterday?.value ?? 0.5);
-    fetchUniqueSpecies(val1);
-    fetchYesterdaySpecies(val2);
-    updateStatsPanel(getSelectedStation());
+    const station = getSelectedStation();
+
+    console.log('[DEBUG] stationSelect changed →', station);
+    fetchUniqueSpecies(val1, station);
+    fetchYesterdaySpecies(val2, station);
+    updateStatsPanel(station);
   });
 }
 
-// ✅ Initial load with debug logging
+// ✅ Initial load with correct station context
 window.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const defaultStation = getSelectedStation();
-    console.log('[DEBUG] Delayed load, station:', defaultStation);
-
-    updateStatsPanel(defaultStation);
-
-    fetch(`php/get_unique_species.php?conf=0.5&station=${defaultStation}`)
-      .then(r => r.json())
-      .then(data => {
-        console.log(`[DEBUG] Unique species at 0.5 for ${defaultStation}:`, data.count);
-        const statSpecies = document.getElementById('statSpecies');
-        if (statSpecies) {
-          statSpecies.textContent = data.count ?? '—';
-          statSpecies.classList.add('text-2xl', 'font-bold', 'text-black');
-        }
-      });
-
-    fetchYesterdaySpecies(0.5);
-  }, 100);
+  const station = getSelectedStation();
+  console.log('[DEBUG] DOMContentLoaded → station =', station);
+  updateStatsPanel(station);
+  fetchUniqueSpecies(0.5, station);
+  fetchYesterdaySpecies(0.5, station);
 });
 
