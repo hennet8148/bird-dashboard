@@ -43,6 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data) {
           if (statSightings) statSightings.textContent = data.total_sightings ?? '—';
+          if (statSpecies) statSpecies.textContent = data.total_species ?? '—';
+          if (statYesterday) statYesterday.textContent = data.yesterday_species?.count ?? '—';
 
           if (sightingsTitle && data.first_date) {
             sightingsTitle.textContent = `Total Detections since ${data.first_date}`;
