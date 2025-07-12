@@ -5,25 +5,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
   const sightingsTitle = document.getElementById('sightingsTitle');
 
-
   const confSlider = document.getElementById('confSlider');
   const confValue = document.getElementById('confValue');
   const confSliderYesterday = document.getElementById('confSliderYesterday');
   const confValueYesterday = document.getElementById('confValueYesterday');
 
-  // Clear saved values on initial load for fresh defaults
+  // Clear saved values on initial load
   localStorage.removeItem('confSlider');
   localStorage.removeItem('confSliderYesterday');
 
-  // Default both sliders to 0.5
   const initialConf = 0.5;
   const initialConfYesterday = 0.5;
-  confSlider.value = initialConf;
-  confValue.textContent = initialConf.toFixed(2);
-  confSliderYesterday.value = initialConfYesterday;
-  confValueYesterday.textContent = initialConfYesterday.toFixed(2);
 
-  // Fetch updated stats
+  if (confSlider && confValue) {
+    confSlider.value = initialConf;
+    confValue.textContent = initialConf.toFixed(2);
+  }
+
+  if (confSliderYesterday && confValueYesterday) {
+    confSliderYesterday.value = initialConfYesterday;
+    confValueYesterday.textContent = initialConfYesterday.toFixed(2);
+  }
+
   function fetchStats() {
     const station = document.getElementById('stationSelect')?.value || '';
     const formData = new FormData();
@@ -40,7 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("DEBUG: stats.php returned →", data);
 
         if (data) {
-          statSightings.textContent = data.total_sightings ?? '—';
+          if (statSightings) statSightings.textContent = data.total_sightings ?? '—';
+          if (statSpecies) statSpecies.textContent = data.total_species ?? '—';
+          if (statYesterday && data.yesterday_species) {
+            const val = data.yesterday_species["0.5"] ?? '—';
+            statYesterday.textContent = val;
+          }
 
           if (sightingsTitle && data.first_date) {
             sightingsTitle.textContent = `Total Detections since ${data.first_date}`;
@@ -48,29 +56,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (lastUpdatedSightings && data.last_updated) {
             const localDate = new Date(data.last_updated.replace(' ', 'T'));
-
             const localTime = localDate.toLocaleTimeString('en-US', {
               hour: '2-digit',
               minute: '2-digit',
               timeZone: 'America/New_York',
               timeZoneName: 'short'
             });
-
             lastUpdatedSightings.textContent = 'Last updated at ' + localTime;
-          } else {
-            console.warn("Missing last_updated field in data");
+          } else if (lastUpdatedSightings) {
             lastUpdatedSightings.textContent = 'Last updated at —';
           }
-        } else {
-          statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
         }
       })
       .catch(err => {
         console.error('Failed to fetch stats:', err);
-        statSightings.textContent = statSpecies.textContent = statYesterday.textContent = '—';
-        if (lastUpdatedSightings) {
-          lastUpdatedSightings.textContent = 'Last updated at —';
-        }
+        if (statSightings) statSightings.textContent = '—';
+        if (statSpecies) statSpecies.textContent = '—';
+        if (statYesterday) statYesterday.textContent = '—';
+        if (lastUpdatedSightings) lastUpdatedSightings.textContent = 'Last updated at —';
       });
   }
 
@@ -78,11 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`php/get_unique_species.php?conf=${conf}`)
       .then(r => r.json())
       .then(data => {
-        statSpecies.textContent = data.count ?? '—';
-        statSpecies.classList.add('text-2xl', 'font-bold', 'text-black');
+        if (statSpecies) {
+          statSpecies.textContent = data.count ?? '—';
+          statSpecies.classList.add('text-2xl', 'font-bold', 'text-black');
+        }
       })
       .catch(() => {
-        statSpecies.textContent = '—';
+        if (statSpecies) statSpecies.textContent = '—';
       });
   }
 
@@ -90,11 +95,13 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch(`php/get_yesterday_species.php?conf=${conf}`)
       .then(r => r.json())
       .then(data => {
-        statYesterday.textContent = data.count ?? '—';
-        statYesterday.classList.add('text-2xl', 'font-bold', 'text-black');
+        if (statYesterday) {
+          statYesterday.textContent = data.count ?? '—';
+          statYesterday.classList.add('text-2xl', 'font-bold', 'text-black');
+        }
       })
       .catch(() => {
-        statYesterday.textContent = '—';
+        if (statYesterday) statYesterday.textContent = '—';
       });
   }
 
@@ -118,10 +125,8 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchYesterdaySpecies(initialConfYesterday);
   }
 
-  // Initial fetch
   fetchStats();
 
-  // Also update when station changes
   const stationSelect = document.getElementById('stationSelect');
   if (stationSelect) {
     stationSelect.addEventListener('change', () => {
