@@ -34,8 +34,8 @@ try {
     // First detection: use station_codes.start_date if available
     $firstDate = '2025-06-24'; // default fallback
     if ($station) {
-        $stmt = $pdo->prepare("SELECT start_date FROM station_codes WHERE station_id = :station_id");
-        $stmt->execute(['station_id' => $station]);
+        $stmt = $pdo->prepare("SELECT start_date FROM station_codes WHERE station_id = :station");
+        $stmt->execute(['station' => $station]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         if ($result && !empty($result['start_date'])) {
             $firstDate = $result['start_date'];

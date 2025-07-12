@@ -8,9 +8,9 @@ try {
     $sql = "SELECT DISTINCT species_common_name FROM sightings";
     $params = [];
 
-    if (!empty($station_id)) {
-        $sql .= " WHERE location = :station_id";
-        $params[':station_id'] = $station_id;
+    if (!empty($station)) {
+        $sql .= " WHERE location = :station";
+        $params[':station'] = $station;
     }
 
     $sql .= " ORDER BY species_common_name ASC";

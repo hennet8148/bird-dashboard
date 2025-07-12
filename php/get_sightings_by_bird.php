@@ -5,7 +5,7 @@ require_once 'config.php';
 
 $bird = $_GET['bird'] ?? '';
 $timeRange = $_GET['timerange'] ?? 'last_hour';
-$station_id = $_GET['station'] ?? '';  // ✅ Added line
+$station = $_GET['station'] ?? '';  // ✅ Added line
 
 if (!$bird) {
     echo json_encode([]);
@@ -41,9 +41,9 @@ $sql = "
 
 $params = [':bird' => $bird];
 
-if (!empty($station_id)) {
-    $sql .= " AND location = :station_id";
-    $params[':station_id'] = $station_id;
+if (!empty($station)) {
+    $sql .= " AND location = :station";
+    $params[':station'] = $station;
 }
 
 $sql .= " ORDER BY timestamp DESC LIMIT 1000";

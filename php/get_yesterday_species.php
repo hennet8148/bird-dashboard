@@ -9,9 +9,9 @@ $yesterday = date('Y-m-d', strtotime('-1 day'));
 $stationClause = '';
 $params = [':conf' => $conf, ':yesterday' => $yesterday];
 
-if (!empty($station_id)) {
-    $stationClause = " AND location = :station_id";
-    $params[':station_id'] = $station_id;
+if (!empty($station)) {
+    $stationClause = " AND location = :station";
+    $params[':station'] = $station;
 }
 
 $stmt = $pdo->prepare("

@@ -20,9 +20,9 @@ try {
 
     $params = [':name' => $name];
 
-    if (!empty($station_id)) {
-        $sql .= " AND location = :station_id";
-        $params[':station_id'] = $station_id;
+    if (!empty($station)) {
+        $sql .= " AND location = :station";
+        $params[':station'] = $station;
     }
 
     $sql .= " ORDER BY timestamp DESC LIMIT 100";

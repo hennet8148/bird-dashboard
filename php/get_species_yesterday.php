@@ -17,9 +17,9 @@ try {
 
     $params = [':threshold' => $threshold];
 
-    if (!empty($station_id)) {
-        $sql .= " AND location = :station_id";
-        $params[':station_id'] = $station_id;
+    if (!empty($station)) {
+        $sql .= " AND location = :station";
+        $params[':station'] = $station;
     }
 
     $sql .= " ORDER BY species_common_name ASC";
