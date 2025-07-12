@@ -1,11 +1,11 @@
 // stats.js
 
-function getSelectedStation() {
+export function getSelectedStation() {
   const stationSelect = document.getElementById('stationSelect');
   return stationSelect ? stationSelect.value : 'All';
 }
 
-export function updateStatsPanel(passedStation = '') {
+export function updateStatsPanel(station = getSelectedStation()) {
   const statSightings = document.getElementById('statSightings');
   const statSpecies = document.getElementById('statSpecies');
   const statYesterday = document.getElementById('statYesterday');
@@ -13,7 +13,6 @@ export function updateStatsPanel(passedStation = '') {
   const sightingsTitle = document.getElementById('sightingsTitle');
 
   const initialConfYesterday = 0.5;
-  const station = passedStation || getSelectedStation();
 
   const formData = new FormData();
   if (station && station !== 'All') {
@@ -27,7 +26,6 @@ export function updateStatsPanel(passedStation = '') {
     .then(response => response.json())
     .then(data => {
       console.log("DEBUG: stats.php returned →", data);
-
       if (!data) return;
 
       if (statSightings) statSightings.textContent = data.total_sightings ?? '—';
@@ -64,7 +62,7 @@ export function updateStatsPanel(passedStation = '') {
     });
 }
 
-function fetchUniqueSpecies(conf, station = getSelectedStation()) {
+export function fetchUniqueSpecies(conf, station = getSelectedStation()) {
   const statSpecies = document.getElementById('statSpecies');
   const params = new URLSearchParams({ conf, station });
 
@@ -82,7 +80,7 @@ function fetchUniqueSpecies(conf, station = getSelectedStation()) {
     });
 }
 
-function fetchYesterdaySpecies(conf, station = getSelectedStation()) {
+export function fetchYesterdaySpecies(conf, station = getSelectedStation()) {
   const statYesterday = document.getElementById('statYesterday');
   const params = new URLSearchParams({ conf, station });
 
@@ -97,60 +95,5 @@ function fetchYesterdaySpecies(conf, station = getSelectedStation()) {
     .catch(() => {
       if (statYesterday) statYesterday.textContent = '—';
     });
-}
-
-// UI Elements
-const confSlider = document.getElementById('confSlider');
-const confValue = document.getElementById('confValue');
-const confSliderYesterday = document.getElementById('confSliderYesterday');
-const confValueYesterday = document.getElementById('confValueYesterday');
-const stationSelect = document.getElementById('stationSelect');
-
-// Clear localStorage on load
-localStorage.removeItem('confSlider');
-localStorage.removeItem('confSliderYesterday');
-
-// Reset sliders visually
-if (confSlider && confValue) {
-  confSlider.value = 0.5;
-  confValue.textContent = '0.50';
-}
-
-if (confSliderYesterday && confValueYesterday) {
-  confSliderYesterday.value = 0.5;
-  confValueYesterday.textContent = '0.50';
-}
-
-// Slider events
-if (confSlider && confValue) {
-  confSlider.addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value);
-    confValue.textContent = val.toFixed(2);
-    localStorage.setItem('confSlider', val);
-    fetchUniqueSpecies(val);
-  });
-}
-
-if (confSliderYesterday && confValueYesterday) {
-  confSliderYesterday.addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value);
-    confValueYesterday.textContent = val.toFixed(2);
-    localStorage.setItem('confSliderYesterday', val);
-    fetchYesterdaySpecies(val);
-  });
-}
-
-// Station change = full reload of panel + re-fetches
-if (stationSelect) {
-  stationSelect.addEventListener('change', () => {
-    const val1 = parseFloat(confSlider?.value ?? 0.5);
-    const val2 = parseFloat(confSliderYesterday?.value ?? 0.5);
-    const station = getSelectedStation();
-
-    console.log('[DEBUG] stationSelect changed →', station);
-    fetchUniqueSpecies(val1, station);
-    fetchYesterdaySpecies(val2, station);
-    updateStatsPanel(station);
-  });
 }
 
