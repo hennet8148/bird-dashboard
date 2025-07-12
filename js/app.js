@@ -208,15 +208,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const station = stationSelect.value;
       updateDataExplorer();
       updateTotalSightings(station);
-      updateStatsPanel(station); // ✅ NEW
+      updateStatsPanel(station); // ✅ on station change
     });
 
     fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
 
-    const station = stationSelect.value;
-    updateDataExplorer();
-    updateTotalSightings(station);
-    updateStatsPanel(station); // ✅ NEW
+    // ✅ DEFERRED INITIALIZATION
+    queueMicrotask(() => {
+      const station = stationSelect.value;
+      updateDataExplorer();
+      updateTotalSightings(station);
+      updateStatsPanel(station); // ✅ prevent race condition on early empty station
+    });
   }
 });
 
