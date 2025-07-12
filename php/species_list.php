@@ -1,4 +1,6 @@
 <?php
+// species_list.php — returns dropdown species for the selected station (if any)
+
 header('Content-Type: application/json');
 
 require_once 'db.php';
@@ -8,6 +10,7 @@ try {
     $sql = "SELECT DISTINCT species_common_name FROM sightings";
     $params = [];
 
+    // If station is set, filter species by station
     if (!empty($station)) {
         $sql .= " WHERE location = :station";
         $params[':station'] = $station;
