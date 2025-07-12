@@ -29,7 +29,14 @@ if (confSliderYesterday && confValueYesterday) {
 }
 
 // Reusable fetch for stats block
-export function updateStatsPanel(station = '') {
+export function updateStatsPanel(passedStation = '') {
+  // If no station passed, try DOM
+  let station = passedStation;
+  if (!station) {
+    const stationSelect = document.getElementById('stationSelect');
+    station = stationSelect ? stationSelect.value : '';
+  }
+
   const formData = new FormData();
   if (station && station !== 'All') {
     formData.append('station', station);
@@ -127,6 +134,6 @@ if (confSliderYesterday && confValueYesterday) {
   fetchYesterdaySpecies(initialConfYesterday);
 }
 
-// Initial stats fetch (default station = '')
+// Initial stats fetch (defaults to stationSelect value)
 updateStatsPanel();
 
