@@ -154,12 +154,18 @@ if (stationSelect) {
   });
 }
 
-// ✅ Initial load with correct station context
+// ✅ Safe load: Wait for station to be populated before fetching
 window.addEventListener('DOMContentLoaded', () => {
-  const station = getSelectedStation();
-  console.log('[DEBUG] DOMContentLoaded → station =', station);
-  updateStatsPanel(station);
-  fetchUniqueSpecies(0.5, station);
-  fetchYesterdaySpecies(0.5, station);
+  const waitForStation = setInterval(() => {
+    const station = getSelectedStation();
+    if (station && station !== '') {
+      clearInterval(waitForStation);
+      console.log(`[DEBUG] Station detected on load → "${station}"`);
+
+      updateStatsPanel(station);
+      fetchUniqueSpecies(0.5, station);
+      fetchYesterdaySpecies(0.5, station);
+    }
+  }, 50); // retry every 50ms
 });
 
