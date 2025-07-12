@@ -1,5 +1,10 @@
 // stats.js
 
+function getSelectedStation() {
+  const stationSelect = document.getElementById('stationSelect');
+  return stationSelect ? stationSelect.value : 'All';
+}
+
 export function updateStatsPanel(passedStation = '') {
   const statSightings = document.getElementById('statSightings');
   const statSpecies = document.getElementById('statSpecies');
@@ -7,11 +12,8 @@ export function updateStatsPanel(passedStation = '') {
   const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
   const sightingsTitle = document.getElementById('sightingsTitle');
 
-  const initialConf = 0.5;
   const initialConfYesterday = 0.5;
-
-  const stationSelect = document.getElementById('stationSelect');
-  let station = passedStation || (stationSelect ? stationSelect.value : '');
+  const station = passedStation || getSelectedStation();
 
   const formData = new FormData();
   if (station && station !== 'All') {
@@ -62,31 +64,6 @@ export function updateStatsPanel(passedStation = '') {
     });
 }
 
-const confSlider = document.getElementById('confSlider');
-const confValue = document.getElementById('confValue');
-const confSliderYesterday = document.getElementById('confSliderYesterday');
-const confValueYesterday = document.getElementById('confValueYesterday');
-const stationSelect = document.getElementById('stationSelect');
-
-// Clear saved values on initial load
-localStorage.removeItem('confSlider');
-localStorage.removeItem('confSliderYesterday');
-
-if (confSlider && confValue) {
-  confSlider.value = 0.5;
-  confValue.textContent = '0.50';
-}
-
-if (confSliderYesterday && confValueYesterday) {
-  confSliderYesterday.value = 0.5;
-  confValueYesterday.textContent = '0.50';
-}
-
-function getSelectedStation() {
-  const stationSelect = document.getElementById('stationSelect');
-  return stationSelect ? stationSelect.value : 'All';
-}
-
 function fetchUniqueSpecies(conf) {
   const statSpecies = document.getElementById('statSpecies');
   const station = getSelectedStation();
@@ -123,6 +100,29 @@ function fetchYesterdaySpecies(conf) {
     });
 }
 
+// UI Elements
+const confSlider = document.getElementById('confSlider');
+const confValue = document.getElementById('confValue');
+const confSliderYesterday = document.getElementById('confSliderYesterday');
+const confValueYesterday = document.getElementById('confValueYesterday');
+const stationSelect = document.getElementById('stationSelect');
+
+// Clear localStorage on load
+localStorage.removeItem('confSlider');
+localStorage.removeItem('confSliderYesterday');
+
+// Reset sliders visually
+if (confSlider && confValue) {
+  confSlider.value = 0.5;
+  confValue.textContent = '0.50';
+}
+
+if (confSliderYesterday && confValueYesterday) {
+  confSliderYesterday.value = 0.5;
+  confValueYesterday.textContent = '0.50';
+}
+
+// Slider events
 if (confSlider && confValue) {
   confSlider.addEventListener('input', (e) => {
     const val = parseFloat(e.target.value);
@@ -130,7 +130,6 @@ if (confSlider && confValue) {
     localStorage.setItem('confSlider', val);
     fetchUniqueSpecies(val);
   });
-  fetchUniqueSpecies(0.5);
 }
 
 if (confSliderYesterday && confValueYesterday) {
@@ -140,20 +139,22 @@ if (confSliderYesterday && confValueYesterday) {
     localStorage.setItem('confSliderYesterday', val);
     fetchYesterdaySpecies(val);
   });
-  fetchYesterdaySpecies(0.5);
 }
 
-// Re-run stats when station changes
+// Station change = full reload of panel + re-fetches
 if (stationSelect) {
   stationSelect.addEventListener('change', () => {
     const val1 = parseFloat(confSlider?.value ?? 0.5);
     const val2 = parseFloat(confSliderYesterday?.value ?? 0.5);
     fetchUniqueSpecies(val1);
     fetchYesterdaySpecies(val2);
-    updateStatsPanel();
+    updateStatsPanel(getSelectedStation());
   });
 }
 
-// Initial load
-updateStatsPanel();
+// ✅ Initial load with selected station
+const defaultStation = getSelectedStation();
+updateStatsPanel(defaultStation);
+fetchUniqueSpecies(0.5);
+fetchYesterdaySpecies(0.5);
 
