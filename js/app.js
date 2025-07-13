@@ -1,5 +1,14 @@
 import { updateStatsPanel, fetchUniqueSpecies, fetchYesterdaySpecies } from './stats.js';
 
+// Debounce helper
+function debounce(fn, delay = 300) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+}
+
 function createSortableHeader(text, key, currentSort, setSort) {
   const th = document.createElement('th');
   th.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider', 'cursor-pointer');
@@ -192,9 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const confSliderYesterday = document.getElementById('confSliderYesterday');
   const confValueYesterday = document.getElementById('confValueYesterday');
 
-  // ✅ Restore stored confidence slider values or fallback to 0.5
   const confVal = parseFloat(localStorage.getItem('confSlider')) || 0.5;
   const confYesterdayVal = parseFloat(localStorage.getItem('confSliderYesterday')) || 0.5;
+
+  const debouncedFetchUniqueSpecies = debounce(fetchUniqueSpecies, 250);
+  const debouncedFetchYesterdaySpecies = debounce(fetchYesterdaySpecies, 250);
 
   if (confSlider && confValue) {
     confSlider.value = confVal;
@@ -205,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = parseFloat(e.target.value);
       confValue.textContent = val.toFixed(2);
       localStorage.setItem('confSlider', val);
-      fetchUniqueSpecies(val);
+      debouncedFetchUniqueSpecies(val);
     });
   }
 
@@ -218,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const val = parseFloat(e.target.value);
       confValueYesterday.textContent = val.toFixed(2);
       localStorage.setItem('confSliderYesterday', val);
-      fetchYesterdaySpecies(val);
+      debouncedFetchYesterdaySpecies(val);
     });
   }
 
