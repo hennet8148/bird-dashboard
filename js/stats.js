@@ -29,7 +29,8 @@ export function updateStatsPanel(station = getSelectedStation()) {
       if (!data) return;
 
       if (statSightings) statSightings.textContent = data.total_sightings ?? '—';
-      if (statSpecies) statSpecies.textContent = data.total_species ?? '—';
+      // ❌ Removed this line:
+      // if (statSpecies) statSpecies.textContent = data.total_species ?? '—';
 
       if (statYesterday && data.yesterday_species) {
         const confKey = initialConfYesterday.toFixed(1);

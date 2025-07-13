@@ -1,6 +1,5 @@
-import { updateStatsPanel, fetchUniqueSpecies, fetchYesterdaySpecies } from './stats.js'; // ✅ Updated
+import { updateStatsPanel, fetchUniqueSpecies, fetchYesterdaySpecies } from './stats.js';
 
-// Helper to create sortable table headers
 function createSortableHeader(text, key, currentSort, setSort) {
   const th = document.createElement('th');
   th.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider', 'cursor-pointer');
@@ -25,7 +24,6 @@ function createSortableHeader(text, key, currentSort, setSort) {
 
 function fetchSightingsByTimeRange(timeRange, station = '', sort) {
   const url = `php/get_sightings_by_timerange.php?timerange=${encodeURIComponent(timeRange)}&station=${encodeURIComponent(station)}`;
-
   fetch(url)
     .then(res => res.json())
     .then(data => {
@@ -189,6 +187,41 @@ document.addEventListener('DOMContentLoaded', () => {
   const stationSelect = document.getElementById('stationSelect');
   const dataExplorer = document.getElementById('dataExplorerContent');
 
+  const confSlider = document.getElementById('confSlider');
+  const confValue = document.getElementById('confValue');
+  const confSliderYesterday = document.getElementById('confSliderYesterday');
+  const confValueYesterday = document.getElementById('confValueYesterday');
+
+  // ✅ Restore stored confidence slider values or fallback to 0.5
+  const confVal = parseFloat(localStorage.getItem('confSlider')) || 0.5;
+  const confYesterdayVal = parseFloat(localStorage.getItem('confSliderYesterday')) || 0.5;
+
+  if (confSlider && confValue) {
+    confSlider.value = confVal;
+    confValue.textContent = confVal.toFixed(2);
+    fetchUniqueSpecies(confVal);
+
+    confSlider.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      confValue.textContent = val.toFixed(2);
+      localStorage.setItem('confSlider', val);
+      fetchUniqueSpecies(val);
+    });
+  }
+
+  if (confSliderYesterday && confValueYesterday) {
+    confSliderYesterday.value = confYesterdayVal;
+    confValueYesterday.textContent = confYesterdayVal.toFixed(2);
+    fetchYesterdaySpecies(confYesterdayVal);
+
+    confSliderYesterday.addEventListener('input', (e) => {
+      const val = parseFloat(e.target.value);
+      confValueYesterday.textContent = val.toFixed(2);
+      localStorage.setItem('confSliderYesterday', val);
+      fetchYesterdaySpecies(val);
+    });
+  }
+
   function updateDataExplorer() {
     const selectedBird = birdSelect.value;
     const selectedTime = timeRangeSelect.value;
@@ -218,37 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
       updateDataExplorer();
       updateTotalSightings(station);
       updateStatsPanel(station);
-    });
-  }
-
-  // ✅ NEW SLIDER HOOKS
-  const confSlider = document.getElementById('confSlider');
-  const confValue = document.getElementById('confValue');
-  const confSliderYesterday = document.getElementById('confSliderYesterday');
-  const confValueYesterday = document.getElementById('confValueYesterday');
-
-  localStorage.removeItem('confSlider');
-  localStorage.removeItem('confSliderYesterday');
-
-  if (confSlider && confValue) {
-    confSlider.value = 0.5;
-    confValue.textContent = '0.50';
-    confSlider.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      confValue.textContent = val.toFixed(2);
-      localStorage.setItem('confSlider', val);
-      fetchUniqueSpecies(val);
-    });
-  }
-
-  if (confSliderYesterday && confValueYesterday) {
-    confSliderYesterday.value = 0.5;
-    confValueYesterday.textContent = '0.50';
-    confSliderYesterday.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      confValueYesterday.textContent = val.toFixed(2);
-      localStorage.setItem('confSliderYesterday', val);
-      fetchYesterdaySpecies(val);
     });
   }
 });
