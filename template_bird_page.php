@@ -28,13 +28,11 @@
     </p>
   </div>
 
-  <!-- Full-width calendar block -->
-  <div class="border-t pt-6 mt-6 px-6">
-    <h2 class="text-xl font-semibold mb-4 px-6">Live Sightings Dashboard</h2>
-
-    <div class="rounded-lg border border-gray-300 bg-gray-50 p-4 inline-block">
-      <div class="max-w-fit mx-auto">
-        <p class="text-sm mb-3 text-gray-700 text-center px-4">
+  <!-- Tight calendar block with matched container -->
+  <div class="border-t pt-6 mt-6 flex justify-center">
+    <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
+      <div class="w-[412px]">
+        <p class="text-sm mb-3 text-gray-700 text-center">
           This calendar shows the days that <strong>{{common_name}}</strong> has been detected on our land by the BirdNET audio monitoring system with a confidence of <strong>0.50 or greater</strong>. Black-highlighted days indicate confirmed detections.
         </p>
         <div id="speciesDashboard" class="text-xs">
