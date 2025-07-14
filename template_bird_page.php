@@ -52,7 +52,7 @@
         </p>
         <div id="hourlyChart" class="text-xs">
           <!-- 📊 Hourly Chart Layout Placeholder -->
-          <?php include __DIR__ . '/../includes/hourly_chart.php'; ?>
+          <?php include __DIR__ . '/../includes/hourly_widget.php'; ?>
         </div>
       </div>
     </div>
