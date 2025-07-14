@@ -48,7 +48,8 @@
     <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
       <div class="w-[412px]">
         <p class="text-sm mb-3 text-gray-700 text-center">
-          This chart shows hourly detection patterns for <strong>{{common_name}}</strong>. Bars represent the number of audio detections per hour, based on data collected since June 24, 2025.
+ Hourly audio detections for <strong>{{common_name}}</strong> since June 24, 2025. 
+  For species with fewer strong matches, lower-confidence detections may be shown to reveal broader patterns.
         </p>
         <div id="hourlyChart" class="text-xs">
           <!-- 📊 Hourly Chart Layout Placeholder -->
