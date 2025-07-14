@@ -29,9 +29,6 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
   }
 }
 
-// Optional: echo to DevTools console
-echo json_encode([
-  'species_code' => $species_code,
-  'result' => $days
-]);
+echo json_encode($days);
+?>
 
