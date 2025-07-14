@@ -10,9 +10,11 @@ if (!$species_code) {
 }
 
 $query = "
-  SELECT DATE(timestamp) as day
-  FROM sightings
-  WHERE species_code = :code AND confidence >= 0.5
+  SELECT DATE(s.timestamp) AS day
+  FROM sightings s
+  JOIN species_codes sc ON s.species_common_name = sc.species_common_name
+  WHERE sc.species_code = :code
+    AND s.confidence >= 0.5
 ";
 
 $stmt = $pdo->prepare($query);
@@ -29,6 +31,8 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
   }
 }
 
-echo json_encode($days);
-?>
+echo json_encode([
+  'species_code' => $species_code,
+  'result' => $days
+]);
 
