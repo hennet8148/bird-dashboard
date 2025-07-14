@@ -1,7 +1,8 @@
 // File: /birds/js/highlightCalendarDays.js
 
 /**
- * Fetches and highlights calendar days for a given species.
+ * Fetches and highlights calendar days for a given species,
+ * and renders a debug overlay showing the raw JSON response.
  * @param {string} speciesCode - The code of the species to highlight.
  */
 export async function highlightCalendarDays(speciesCode) {
@@ -20,7 +21,28 @@ export async function highlightCalendarDays(speciesCode) {
     const json = await res.json();
     console.log("🐦 Highlight API response:", json);
 
-    // If your PHP returns { species_code, result }, use .result, otherwise use the payload directly
+    // —————— Debug Overlay ——————
+    const pre = document.createElement("pre");
+    Object.assign(pre.style, {
+      position: "fixed",
+      bottom: "0",
+      left: "0",
+      right: "0",
+      maxHeight: "30%",
+      overflowY: "auto",
+      background: "rgba(0,0,0,0.8)",
+      color: "#0f0",
+      padding: "0.5rem",
+      fontSize: "12px",
+      zIndex: "9999",
+      margin: 0,
+      whiteSpace: "pre-wrap"
+    });
+    pre.textContent = JSON.stringify(json, null, 2);
+    document.body.appendChild(pre);
+    // —————————————————————————————————
+
+    // If your PHP returns { species_code, result }, use .result; otherwise use the payload directly
     const data = json.result ?? json;
 
     // Loop months → days, flip matching cells to black/white
