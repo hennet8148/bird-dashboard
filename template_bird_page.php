@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Sightings and data for {{common_name}} at Davidson Farm Bird Project.">
   <title>{{common_name}} | Davidson Farm Bird Project</title>
-  <link href="/dashboard/css/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-white text-gray-800">
   <div class="max-w-5xl mx-auto p-6">
