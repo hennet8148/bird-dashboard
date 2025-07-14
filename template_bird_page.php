@@ -29,6 +29,12 @@
       </div>
     </div>
   </div>
+
+  <!-- Inject species code and load highlight JS -->
+  <script>
+    window.speciesCode = "{{species_code}}";
+  </script>
+  <script type="module" src="/dashboard/js/highlightCalendarDays.js"></script>
 </body>
 </html>
 
