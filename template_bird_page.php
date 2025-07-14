@@ -23,9 +23,11 @@
 
     <div class="border-t pt-6 mt-6">
       <h2 class="text-xl font-semibold mb-2">Live Sightings Dashboard</h2>
-      <p class="text-sm text-gray-500 mb-4">(Coming soon — this section will show graphs and recent data.)</p>
-      <div id="speciesDashboard">
-        <!-- Dynamic charts and tables will load here -->
+      <div id="speciesDashboard" class="text-xs">
+        <!-- 🗓️ Static Year Calendar Grid Placeholder -->
+        <div class="grid grid-cols-3 gap-4">
+          {{calendar_blocks}}
+        </div>
       </div>
     </div>
   </div>
