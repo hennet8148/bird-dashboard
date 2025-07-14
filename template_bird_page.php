@@ -28,7 +28,7 @@
     </p>
   </div>
 
-  <!-- Tight calendar block with matched container -->
+  <!-- Tight calendar block -->
   <div class="border-t pt-6 mt-6 flex justify-center">
     <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
       <div class="w-[412px]">
@@ -38,6 +38,21 @@
         <div id="speciesDashboard" class="text-xs">
           <!-- 🗓️ Real Calendar Layout -->
           <?php include __DIR__ . '/../includes/calendar.php'; ?>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hourly detection widget block -->
+  <div class="mt-10 flex justify-center">
+    <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
+      <div class="w-[412px]">
+        <p class="text-sm mb-3 text-gray-700 text-center">
+          This chart shows hourly detection patterns for <strong>{{common_name}}</strong>. Bars represent the number of audio detections per hour, based on data collected since June 24, 2025.
+        </p>
+        <div id="hourlyChart" class="text-xs">
+          <!-- 📊 Hourly Chart Layout Placeholder -->
+          <?php include __DIR__ . '/../includes/hourly_chart.php'; ?>
         </div>
       </div>
     </div>
