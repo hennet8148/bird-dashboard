@@ -5,13 +5,13 @@ error_reporting(E_ALL);
 
 header('Content-Type: application/json');
 
-require_once 'db.php'; // Assumes this is in the same folder as db.php
+require_once 'db.php';
 
 try {
     $stmt = $pdo->query("
-        SELECT * 
-        FROM weather 
-        ORDER BY timestamp DESC 
+        SELECT *
+        FROM weather_readings
+        ORDER BY timestamp DESC
         LIMIT 1
     ");
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
