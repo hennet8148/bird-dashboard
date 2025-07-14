@@ -25,7 +25,7 @@
       <h2 class="text-xl font-semibold mb-4">Live Sightings Dashboard</h2>
       <div id="speciesDashboard" class="text-xs">
         <!-- 🗓️ Real Calendar Layout -->
-        <?php include 'includes/calendar.php'; ?>
+        <?php include __DIR__ . '/../includes/calendar.php'; ?>
       </div>
     </div>
   </div>
