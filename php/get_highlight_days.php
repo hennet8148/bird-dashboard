@@ -1,6 +1,8 @@
 <?php
 require_once 'db.php'; // includes PDO $pdo
 
+header('Content-Type: application/json');
+
 $species_code = $_GET['species_code'] ?? '';
 if (!$species_code) {
   echo json_encode(['error' => 'Missing species_code']);
@@ -27,6 +29,9 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
   }
 }
 
-echo json_encode($days);
-?>
+// Optional: echo to DevTools console
+echo json_encode([
+  'species_code' => $species_code,
+  'result' => $days
+]);
 

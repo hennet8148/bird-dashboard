@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // You must pass the species_code to the page, either as a JS variable or via data attribute
   const speciesCode = window.speciesCode || null;
 
   if (!speciesCode) {
@@ -10,8 +9,11 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch(`/dashboard/php/get_highlight_days.php?species_code=${speciesCode}`)
     .then(res => res.json())
     .then(data => {
-      Object.entries(data).forEach(([month, days]) => {
-        days.forEach(day => {
+      console.log("🐦 Highlight API Response:", data);
+
+      const days = data.result;
+      Object.entries(days).forEach(([month, dayList]) => {
+        dayList.forEach(day => {
           const id = `day-${month.toLowerCase()}-${String(day).padStart(2, '0')}`;
           const el = document.getElementById(id);
           if (el) {
