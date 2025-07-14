@@ -11,7 +11,7 @@ if (!$species_code) {
 
 $query = "
   SELECT DATE(timestamp) as day
-  FROM sightings_s2
+  FROM sightings
   WHERE species_code = :code AND confidence >= 0.5
 ";
 
