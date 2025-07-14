@@ -14,29 +14,24 @@ $calendar_data = [
   'December'  => ['start' => 1, 'days' => 31],
 ];
 ?>
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-[10px] leading-none text-center">
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 text-[9px] leading-tight text-center">
   <?php foreach ($calendar_data as $month => $meta): ?>
-    <div class="border rounded bg-gray-50 p-2 w-[140px] mx-auto">
-      <h3 class="text-sm font-semibold bg-gray-200 rounded px-2 py-1 mb-1">
-        <?php echo $month; ?>
-      </h3>
-      <div class="grid grid-cols-7 gap-[2px]">
+    <div class="border rounded bg-gray-50 p-1 w-[110px] mx-auto">
+      <h3 class="text-xs font-semibold bg-gray-200 rounded px-1 py-0.5 mb-0.5"><?php echo $month; ?></h3>
+      <div class="grid grid-cols-7 gap-[1px]">
         <?php
           // Weekday headers
-          $weekdays = ['Su','Mo','Tu','We','Th','Fr','Sa'];
-          foreach ($weekdays as $wd) {
+          foreach (['Su','Mo','Tu','We','Th','Fr','Sa'] as $wd) {
             echo "<div class='font-bold text-gray-500'>{$wd}</div>";
           }
-
-          // Empty slots to align the first day
+          // Empty slots
           for ($i = 0; $i < $meta['start']; $i++) {
-            echo "<div class='w-6 h-6'></div>";
+            echo "<div class='w-5 h-5'></div>";
           }
-
-          // Day cells with unique IDs
+          // Day cells
           for ($d = 1; $d <= $meta['days']; $d++) {
-            $id = 'day-' . strtolower($month) . '-' . str_pad($d, 2, '0', STR_PAD_LEFT);
-            echo "<div id='{$id}' class='w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200'>{$d}</div>";
+            $id = 'day-'.strtolower($month).'-'.str_pad($d,2,'0',STR_PAD_LEFT);
+            echo "<div id='{$id}' class='w-5 h-5 flex items-center justify-center rounded hover:bg-gray-200'>{$d}</div>";
           }
         ?>
       </div>
@@ -44,7 +39,6 @@ $calendar_data = [
   <?php endforeach; ?>
 </div>
 
-<!-- Load the highlighting module and run it -->
 <script type="module">
   import { highlightCalendarDays } from '/birds/js/highlightCalendarDays.js';
   if (window.speciesCode) {
