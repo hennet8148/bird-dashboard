@@ -6,13 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  fetch(`/dashboard/php/get_highlight_days.php?species_code=${speciesCode}`)
+  fetch(`/birds/php/get_highlight_days.php?species_code=${speciesCode}`)
     .then(res => res.json())
     .then(data => {
       console.log("🐦 Highlight API Response:", data);
 
-      const days = data.result;
-      Object.entries(days).forEach(([month, dayList]) => {
+      Object.entries(data).forEach(([month, dayList]) => {
         dayList.forEach(day => {
           const id = `day-${month.toLowerCase()}-${String(day).padStart(2, '0')}`;
           const el = document.getElementById(id);
