@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Weather</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8 text-gray-900">
+
+  <div id="weather" class="max-w-md mx-auto bg-white shadow-xl rounded-xl p-6 space-y-4">
+    <h2 class="text-2xl font-semibold border-b pb-2">Current Weather</h2>
+    <div id="weather-data" class="space-y-1 text-lg">
+      <p>Loading...</p>
+    </div>
+  </div>
+
+  <script>
+    fetch('/birds/php/weather.php')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const w = data.data;
+          document.getElementById('weather-data').innerHTML = `
+            <p><strong>Time:</strong> ${w.timestamp}</p>
+            <p><strong>Temperature:</strong> ${w.temperature} °F</p>
+            <p><strong>Humidity:</strong> ${w.humidity} %</p>
+            <p><strong>Dew Point:</strong> ${w.dew_point} °F</p>
+            <p><strong>Wind:</strong> ${w.wind_speed} mph</p>
+            <p><strong>Pressure:</strong> ${w.pressure} inHg</p>
+          `;
+        } else {
+          document.getElementById('weather-data').innerHTML = `<p class="text-red-500">${data.error}</p>`;
+        }
+      })
+      .catch(err => {
+        document.getElementById('weather-data').innerHTML = `<p class="text-red-500">Error loading weather.</p>`;
+        console.error(err);
+      });
+  </script>
+
+</body>
+</html>
+
