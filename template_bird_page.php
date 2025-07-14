@@ -29,9 +29,16 @@
 
     <div class="border-t pt-6 mt-6">
       <h2 class="text-xl font-semibold mb-4">Live Sightings Dashboard</h2>
-      <div id="speciesDashboard" class="text-xs">
-        <!-- 🗓️ Real Calendar Layout -->
-        <?php include __DIR__ . '/../includes/calendar.php'; ?>
+
+      <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
+        <p class="text-sm mb-3 text-gray-700">
+          This calendar shows the days that <strong>{{common_name}}</strong> has been detected on our land by the BirdNET audio monitoring system with a confidence of <strong>0.50 or greater</strong>. Black-highlighted days indicate confirmed detections.
+        </p>
+
+        <div id="speciesDashboard" class="text-xs">
+          <!-- 🗓️ Real Calendar Layout -->
+          <?php include __DIR__ . '/../includes/calendar.php'; ?>
+        </div>
       </div>
     </div>
   </div>
