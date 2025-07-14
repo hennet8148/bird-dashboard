@@ -6,11 +6,17 @@ export async function renderHourlyWidget(speciesCode) {
   const res = await fetch(`/birds/php/get_hourly_distribution.php?species_code=${speciesCode}`);
   if (!res.ok) return;
 
-  const { hourly_counts } = await res.json();
+  const {
+    hourly_counts,
+    total_detections,
+    average_confidence,
+    max_confidence
+  } = await res.json();
+
   const widget = document.getElementById("hourlyWidget");
   if (!widget) return;
 
-  // Normalize keys to 0-23 as strings
+  // Normalize keys to 0–23
   const counts = {};
   for (let i = 0; i < 24; i++) {
     const key = String(i);
@@ -18,7 +24,6 @@ export async function renderHourlyWidget(speciesCode) {
   }
 
   const max = Math.max(...Object.values(counts));
-
   const container = document.createElement("div");
   container.className = "space-y-[2px]";
 
@@ -32,7 +37,7 @@ export async function renderHourlyWidget(speciesCode) {
 
     const bar = document.createElement("div");
     const relWidth = max ? Math.round((counts[i] / max) * 100) : 0;
-    bar.className = `h-3 bg-gray-700 rounded`; // adjust color as needed
+    bar.className = `h-3 bg-gray-700 rounded`;
     bar.style.width = `${relWidth}%`;
 
     row.appendChild(label);
@@ -40,7 +45,13 @@ export async function renderHourlyWidget(speciesCode) {
     container.appendChild(row);
   }
 
+  // Summary footer
+  const footer = document.createElement("p");
+  footer.className = "mt-4 text-[10px] text-gray-600 text-center";
+  footer.textContent = `Based on ${total_detections} detections — average confidence: ${average_confidence}, max: ${max_confidence}`;
+
   widget.innerHTML = "";
   widget.appendChild(container);
+  widget.appendChild(footer);
 }
 
