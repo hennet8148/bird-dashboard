@@ -25,10 +25,10 @@
       <h2 class="text-xl font-semibold mb-2">Live Sightings Dashboard</h2>
       <div id="speciesDashboard" class="text-xs">
         <!-- 🗓️ Full Static Year Calendar Grid for 2025 -->
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-4 gap-4 text-center text-[10px] leading-none">
 
           <!-- JANUARY 2025 -->
-<div class="border rounded p-2">
+<div class="border rounded p-2 w-[140px]">
   <h3 class="text-center font-semibold mb-1">January</h3>
   <div class="grid grid-cols-7 gap-1 text-center">
     <div class="text-xs font-bold text-gray-500">Su</div><div class="text-xs font-bold text-gray-500">Mo</div><div class="text-xs font-bold text-gray-500">Tu</div><div class="text-xs font-bold text-gray-500">We</div><div class="text-xs font-bold text-gray-500">Th</div><div class="text-xs font-bold text-gray-500">Fr</div><div class="text-xs font-bold text-gray-500">Sa</div>
