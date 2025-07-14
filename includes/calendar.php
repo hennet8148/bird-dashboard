@@ -30,11 +30,22 @@ $calendar_data = [
           }
 
           for ($d = 1; $d <= $meta['days']; $d++) {
-            echo "<div class='w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200'>$d</div>";
+            $id = "day-" . strtolower($month) . "-" . str_pad($d, 2, "0", STR_PAD_LEFT);
+            echo "<div id='$id' class='w-6 h-6 flex items-center justify-center rounded hover:bg-gray-200'>$d</div>";
           }
         ?>
       </div>
     </div>
   <?php endforeach; ?>
 </div>
+
+<script type="module">
+  if (window.speciesCode) {
+    import('/birds/js/highlightCalendarDays.js').then(mod => {
+      mod.highlightCalendarDays?.(window.speciesCode);
+    }).catch(err => {
+      console.error("Failed to load highlightCalendarDays.js", err);
+    });
+  }
+</script>
 

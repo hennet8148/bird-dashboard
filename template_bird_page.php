@@ -30,11 +30,10 @@
     </div>
   </div>
 
-  <!-- Inject species code and load highlight JS -->
-<script>
+  <!-- Inject species code for use in calendar highlighting -->
+  <script>
     window.speciesCode = "{{species_code}}";
   </script>
-  <script type="module" src="/birds/js/highlightCalendarDays.js"></script>
 </body>
 </html>
 
