@@ -17,7 +17,7 @@ $query = "
   FROM sightings s
   JOIN species_codes sc ON s.species_common_name = sc.species_common_name
   WHERE sc.species_code = :code
-    AND s.confidence >= 0.5
+    AND s.confidence >= 0.255555
   GROUP BY HOUR(s.timestamp)
   ORDER BY hour
 ";
