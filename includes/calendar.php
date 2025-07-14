@@ -14,13 +14,13 @@ $calendar_data = [
   'December'  => ['start' => 1, 'days' => 31],
 ];
 ?>
-<div class="grid grid-cols-4 gap-0.5 text-[8px] leading-tight text-center">
+<div class="inline-grid grid-cols-4 gap-0 text-[8px] leading-tight text-center">
   <?php foreach ($calendar_data as $month => $meta): ?>
-    <div class="border rounded bg-gray-50 p-0.5 w-[96px]">
-      <h3 class="text-xs font-semibold bg-gray-200 rounded px-0.5 py-0.25 mb-0.25">
+    <div class="border rounded bg-gray-50 p-0 w-[96px]">
+      <h3 class="text-xs font-semibold bg-gray-200 rounded px-0 py-0 mb-0">
         <?php echo $month; ?>
       </h3>
-      <div class="grid grid-cols-7 gap-[0.5px]">
+      <div class="grid grid-cols-7 gap-0">
         <?php
           foreach (['Su','Mo','Tu','We','Th','Fr','Sa'] as $wd) {
             echo "<div class='font-bold text-gray-500'>{$wd}</div>";
