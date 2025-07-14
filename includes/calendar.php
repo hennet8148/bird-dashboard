@@ -14,24 +14,23 @@ $calendar_data = [
   'December'  => ['start' => 1, 'days' => 31],
 ];
 ?>
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 text-[9px] leading-tight text-center">
+<div class="grid grid-cols-4 gap-0.5 text-[8px] leading-tight text-center">
   <?php foreach ($calendar_data as $month => $meta): ?>
-    <div class="border rounded bg-gray-50 p-1 w-[110px] mx-auto">
-      <h3 class="text-xs font-semibold bg-gray-200 rounded px-1 py-0.5 mb-0.5"><?php echo $month; ?></h3>
-      <div class="grid grid-cols-7 gap-[1px]">
+    <div class="border rounded bg-gray-50 p-0.5 w-[96px]">
+      <h3 class="text-xs font-semibold bg-gray-200 rounded px-0.5 py-0.25 mb-0.25">
+        <?php echo $month; ?>
+      </h3>
+      <div class="grid grid-cols-7 gap-[0.5px]">
         <?php
-          // Weekday headers
           foreach (['Su','Mo','Tu','We','Th','Fr','Sa'] as $wd) {
             echo "<div class='font-bold text-gray-500'>{$wd}</div>";
           }
-          // Empty slots
           for ($i = 0; $i < $meta['start']; $i++) {
-            echo "<div class='w-5 h-5'></div>";
+            echo "<div class='w-4 h-4'></div>";
           }
-          // Day cells
           for ($d = 1; $d <= $meta['days']; $d++) {
             $id = 'day-'.strtolower($month).'-'.str_pad($d,2,'0',STR_PAD_LEFT);
-            echo "<div id='{$id}' class='w-5 h-5 flex items-center justify-center rounded hover:bg-gray-200'>{$d}</div>";
+            echo "<div id='{$id}' class='w-4 h-4 flex items-center justify-center rounded hover:bg-gray-200'>{$d}</div>";
           }
         ?>
       </div>
@@ -41,8 +40,6 @@ $calendar_data = [
 
 <script type="module">
   import { highlightCalendarDays } from '/birds/js/highlightCalendarDays.js';
-  if (window.speciesCode) {
-    highlightCalendarDays(window.speciesCode);
-  }
+  if (window.speciesCode) highlightCalendarDays(window.speciesCode);
 </script>
 
