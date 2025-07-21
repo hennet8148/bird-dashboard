@@ -9,7 +9,7 @@
 </div>
 
 <script type="module">
-  import { renderHourlyWidget } from "/birds/js/hourlyActivityWidget.js";
+  import { renderHourlyWidget } from "/dashboard/js/hourlyActivityWidget.js";
   renderHourlyWidget(window.speciesCode);
 </script>
 

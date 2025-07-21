@@ -3,7 +3,7 @@
 export async function renderHourlyWidget(speciesCode) {
   if (!speciesCode) return;
 
-  const res = await fetch(`/birds/php/get_hourly_distribution.php?species_code=${speciesCode}`);
+  const res = await fetch(`/dashboard/php/get_hourly_distribution.php?species_code=${speciesCode}`);
   if (!res.ok) return;
 
   const {

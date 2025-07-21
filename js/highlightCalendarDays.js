@@ -1,4 +1,4 @@
-// File: /birds/js/highlightCalendarDays.js
+// File: /dashboard/js/highlightCalendarDays.js
 
 /**
  * Fetches and highlights calendar days for a given species.
@@ -13,7 +13,7 @@ export async function highlightCalendarDays(speciesCode) {
   try {
     // ✅ Correct path on the live server
     const res = await fetch(
-      `/birds/php/get_highlight_days.php?species_code=${speciesCode}`
+      `/dashboard/php/get_highlight_days.php?species_code=${speciesCode}`
     );
     if (!res.ok) {
       throw new Error(`get_highlight_days.php returned HTTP ${res.status}`);

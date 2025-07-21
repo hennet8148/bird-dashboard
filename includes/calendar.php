@@ -39,7 +39,7 @@ $calendar_data = [
 </div>
 
 <script type="module">
-  import { highlightCalendarDays } from '/birds/js/highlightCalendarDays.js';
+  import { highlightCalendarDays } from '/dashboard/js/highlightCalendarDays.js';
   if (window.speciesCode) highlightCalendarDays(window.speciesCode);
 </script>
 
