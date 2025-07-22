@@ -1,100 +1,68 @@
-// stats.js
+// dashboard/js/stats.js
 
+// Get the selected station (if you ever add a selector)
 export function getSelectedStation() {
   const stationSelect = document.getElementById('stationSelect');
   return stationSelect ? stationSelect.value : 'All';
 }
 
-export function updateStatsPanel(station = getSelectedStation()) {
-  const statSightings = document.getElementById('statSightings');
+/**
+ * Fetch and render the "Unique Species to Date" card.
+ * @param {number} conf  Confidence threshold (0.00–1.00)
+ * @param {string} station  Station ID, e.g. 'S1' or 'All'
+ */
+export async function fetchUniqueSpecies(conf, station = getSelectedStation()) {
   const statSpecies = document.getElementById('statSpecies');
-  const statYesterday = document.getElementById('statYesterday');
-  const lastUpdatedSightings = document.getElementById('lastUpdatedSightings');
-  const sightingsTitle = document.getElementById('sightingsTitle');
+  const listEl       = document.getElementById('speciesList');
+  const sliderEl     = document.getElementById('confSlider');
+  const valueLabel   = document.getElementById('confValue');
 
-  const initialConfYesterday = 0.5;
+  try {
+    const params = new URLSearchParams({ conf: conf.toFixed(2), station });
+    const res    = await fetch(`/dashboard/php/get_unique_species.php?${params}`);
+    const data   = await res.json();
+    console.log(`[DEBUG] fetchUniqueSpecies(conf=${conf}) →`, data);
 
-  const formData = new FormData();
-  if (station && station !== 'All') {
-    formData.append('station', station);
+    // Update the big number
+    if (statSpecies) {
+      statSpecies.textContent = 
+        data.unique_species_count != null
+          ? new Intl.NumberFormat().format(data.unique_species_count)
+          : '—';
+    }
+
+    // Update the slider label
+    if (valueLabel) {
+      valueLabel.textContent = conf.toFixed(2);
+    }
+
+    // Populate the list
+    if (listEl) {
+      listEl.innerHTML = '';
+      (data.species_list || []).forEach(name => {
+        const li = document.createElement('li');
+        li.textContent = name;
+        listEl.appendChild(li);
+      });
+    }
+  } catch (err) {
+    console.error('fetchUniqueSpecies error', err);
+    if (statSpecies) statSpecies.textContent = '—';
   }
-
-  fetch('php/stats.php', {
-    method: 'POST',
-    body: formData
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log("DEBUG: stats.php returned →", data);
-      if (!data) return;
-
-      if (statSightings) statSightings.textContent = data.total_sightings ?? '—';
-      // ❌ Removed this line:
-      // if (statSpecies) statSpecies.textContent = data.total_species ?? '—';
-
-      if (statYesterday && data.yesterday_species) {
-        const confKey = initialConfYesterday.toFixed(1);
-        statYesterday.textContent = data.yesterday_species[confKey] ?? '—';
-      }
-
-      if (sightingsTitle && data.first_date) {
-        sightingsTitle.textContent = `Total Detections since ${data.first_date}`;
-      }
-
-      if (lastUpdatedSightings && data.last_updated) {
-        const localDate = new Date(data.last_updated.replace(' ', 'T'));
-        const localTime = localDate.toLocaleTimeString('en-US', {
-          hour: '2-digit',
-          minute: '2-digit',
-          timeZone: 'America/New_York',
-          timeZoneName: 'short'
-        });
-        lastUpdatedSightings.textContent = 'Last updated at ' + localTime;
-      } else if (lastUpdatedSightings) {
-        lastUpdatedSightings.textContent = 'Last updated at —';
-      }
-    })
-    .catch(err => {
-      console.error('Failed to fetch stats:', err);
-      if (statSightings) statSightings.textContent = '—';
-      if (statSpecies) statSpecies.textContent = '—';
-      if (statYesterday) statYesterday.textContent = '—';
-      if (lastUpdatedSightings) lastUpdatedSightings.textContent = 'Last updated at —';
-    });
 }
 
-export function fetchUniqueSpecies(conf, station = getSelectedStation()) {
-  const statSpecies = document.getElementById('statSpecies');
-  const params = new URLSearchParams({ conf, station });
+// On page load, kick off the first fetch at the default slider value
+document.addEventListener('DOMContentLoaded', () => {
+  const slider = document.getElementById('confSlider');
+  if (!slider) return;
 
-  fetch(`php/get_unique_species.php?${params.toString()}`)
-    .then(r => r.json())
-    .then(data => {
-      console.log(`[DEBUG] fetchUniqueSpecies(conf=${conf}, station=${station}) returned →`, data.count);
-      if (statSpecies) {
-        statSpecies.textContent = data.count ?? '—';
-        statSpecies.classList.add('text-2xl', 'font-bold', 'text-black');
-      }
-    })
-    .catch(() => {
-      if (statSpecies) statSpecies.textContent = '—';
-    });
-}
+  const initialConf = parseFloat(slider.value) || 0.5;
+  fetchUniqueSpecies(initialConf);
 
-export function fetchYesterdaySpecies(conf, station = getSelectedStation()) {
-  const statYesterday = document.getElementById('statYesterday');
-  const params = new URLSearchParams({ conf, station });
-
-  fetch(`php/get_yesterday_species.php?${params.toString()}`)
-    .then(r => r.json())
-    .then(data => {
-      if (statYesterday) {
-        statYesterday.textContent = data.count ?? '—';
-        statYesterday.classList.add('text-2xl', 'font-bold', 'text-black');
-      }
-    })
-    .catch(() => {
-      if (statYesterday) statYesterday.textContent = '—';
-    });
-}
+  // Also listen for slider changes to re-fetch
+  slider.addEventListener('input', () => {
+    const conf = parseFloat(slider.value);
+    fetchUniqueSpecies(conf);
+  });
+});
 
