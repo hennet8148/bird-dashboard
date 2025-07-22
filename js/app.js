@@ -71,11 +71,9 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
 
       const table = document.createElement('table');
       table.classList.add('min-w-full', 'divide-y', 'divide-gray-200');
-
       const thead = document.createElement('thead');
       thead.classList.add('bg-gray-50');
       const trHead = document.createElement('tr');
-
       const currentSort = fetchSightingsByTimeRange.currentSort || { key: 'sightings_count', asc: false };
       const setSort = newSort => {
         fetchSightingsByTimeRange.currentSort = newSort;
@@ -86,13 +84,11 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
       trHead.appendChild(createSortableHeader('Sightings', 'sightings_count', currentSort, setSort));
       trHead.appendChild(createSortableHeader('Avg Confidence', 'avg_confidence', currentSort, setSort));
       trHead.appendChild(createSortableHeader('Max Confidence', 'max_confidence', currentSort, setSort));
-
       thead.appendChild(trHead);
       table.appendChild(thead);
 
       const tbody = document.createElement('tbody');
       tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
-
       data.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -105,7 +101,6 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
         `;
         tbody.appendChild(tr);
       });
-
       table.appendChild(tbody);
       container.appendChild(wrapScrollable(table));
     })
@@ -116,11 +111,12 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
     });
 }
 
-// Fetch and render per-bird sightings
+// Fetch and render per‑bird sightings
 function fetchSightingsByBird(bird, timeRange, station = '') {
   const container = document.getElementById('dataExplorerContent');
   container.innerHTML = '';
   container.classList.add('relative');
+
   if (!bird) {
     container.innerHTML = '<p>Please select a bird to see data.</p>';
     return;
@@ -148,10 +144,79 @@ function fetchSightingsByBird(bird, timeRange, station = '') {
 
       const tbody = document.createElement('tbody');
       tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
-
       data.forEach(row => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.timestamp}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.confidence).toFixed(2)}</td>\``
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.confidence).toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      container.appendChild(wrapScrollable(table));
+    })
+    .catch(err => {
+      console.error('Error fetching bird sightings:', err);
+      if (container) container.innerHTML = '<p>Failed to load bird data.</p>';
+    });
+}
+
+// Fetch & render total sightings summary
+function updateTotalSightings(station = '') {
+  const url = `/dashboard/php/stats.php`;
+  const formData = new FormData();
+  if (station && station !== 'All') formData.append('station', station);
+
+  fetch(url, { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('totalSightings');
+      if (!container) return;
+
+      const startDate = new Date(data.first_date).toLocaleDateString();
+      const lastTime = new Date(data.last_updated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+
+      container.innerHTML = `
+        <div class="text-sm text-gray-500 text-center mb-1">Total Sightings since ${startDate}</div>
+        <div class="text-3xl font-bold text-center">${data.total_sightings.toLocaleString()}</div>
+        <hr class="my-2">
+        <div class="text-sm text-gray-500 text-center">Last updated at ${lastTime}</div>
+      `;
+    })
+    .catch(err => console.error('Error fetching total sightings:', err));
+}
+
+// Wire up controls and initial load
+document.addEventListener('DOMContentLoaded', () => {
+  const stationSelect = document.getElementById('stationSelect');
+  const birdSelect = document.getElementById('birdSelect');
+  const timeRangeSelect = document.getElementById('timeRange');
+  const dataExplorer = document.getElementById('dataExplorerContent');
+
+  if (!stationSelect || !birdSelect || !timeRangeSelect || !dataExplorer) return;
+
+  fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
+
+  const updateAll = () => {
+    const station = stationSelect.value;
+    const timerange = timeRangeSelect.value;
+    const bird = birdSelect.value;
+
+    fetchUniqueSpecies(parseFloat(localStorage.getItem('confSlider') || 0.5), station);
+
+    if (bird) {
+      fetchSightingsByBird(bird, timerange, station);
+    } else {
+      fetchSightingsByTimeRange(timerange, station, fetchSightingsByTimeRange.currentSort);
+    }
+
+    updateTotalSightings(station);
+  };
+
+  stationSelect.addEventListener('change', updateAll);
+  birdSelect.addEventListener('change', updateAll);
+  timeRangeSelect.addEventListener('change', updateAll);
+
+  updateAll();
+});
 
