@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  fetch('/dashboard/php/get_summary.php')
+  fetch('https://davidsonfarmbirdproject.org/dashboard/php/get_summary.php')
     .then(res => res.json())
     .then(data => {
       const el = document.getElementById('totalSightings');
