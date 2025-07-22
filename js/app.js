@@ -104,55 +104,31 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
     });
 }
 
-function fetchSightingsByBird(bird, timeRange, station = '') {
-  const container = document.getElementById('dataExplorerContent');
-  if (!bird) {
-    container.innerHTML = '<p>Please select a bird to see data.</p>';
-    return;
-  }
+$1
 
-  const url = `/dashboard/php/get_sightings_by_bird.php?bird=${encodeURIComponent(bird)}&timerange=${encodeURIComponent(timeRange)}&station=${encodeURIComponent(station)}`;
+// Fetch & render total sightings summary
+function updateTotalSightings(station = '') {
+  const url = `/dashboard/php/stats.php`;
+  const formData = new FormData();
+  if (station && station !== 'All') formData.append('station', station);
 
-  fetch(url)
+  fetch(url, { method: 'POST', body: formData })
     .then(res => res.json())
     .then(data => {
-      if (!data.length) {
-        container.innerHTML = '<p>No sightings found for this bird and time range.</p>';
-        return;
-      }
+      const container = document.getElementById('totalSightings');
+      if (!container) return;
 
-      const table = document.createElement('table');
-      table.classList.add('min-w-full', 'divide-y', 'divide-gray-200');
+      const startDate = new Date(data.first_date).toLocaleDateString();
+      const lastTime = new Date(data.last_updated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
 
-      table.innerHTML = `
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
-          </tr>
-        </thead>
+      container.innerHTML = `
+        <div class="text-sm text-gray-500 text-center mb-1">Total Sightings since ${startDate}</div>
+        <div class="text-3xl font-bold text-center">${data.total_sightings.toLocaleString()}</div>
+        <hr class="my-2">
+        <div class="text-sm text-gray-500 text-center">Last updated at ${lastTime}</div>
       `;
-
-      const tbody = document.createElement('tbody');
-      tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
-
-      data.forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.timestamp}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.confidence).toFixed(2)}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-
-      table.appendChild(tbody);
-      container.innerHTML = '';
-      container.appendChild(table);
     })
-    .catch(err => {
-      console.error('Error fetching bird sightings:', err);
-      container.innerHTML = '<p>Failed to load bird data.</p>';
-    });
+    .catch(err => console.error('Error fetching total sightings:', err));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
