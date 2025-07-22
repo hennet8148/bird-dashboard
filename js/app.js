@@ -174,5 +174,55 @@ function updateTotalSightings(station = '') {
   if (station && station !== 'All') formData.append('station', station);
 
   fetch(url, { method: 'POST', body: formData })
-    .then(res => res.json())\198
+    .then(res => res.json())
+    .then(data => {
+      const container = document.getElementById('totalSightings');
+      if (!container) return;
+
+      const startDate = new Date(data.first_date).toLocaleDateString();
+      const lastTime = new Date(data.last_updated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+
+      container.innerHTML = `
+        <div class="text-sm text-gray-500 text-center mb-1">Total Sightings since ${startDate}</div>
+        <div class="text-3xl font-bold text-center">${data.total_sightings.toLocaleString()}</div>
+        <hr class="my-2">
+        <div class="text-sm text-gray-500 text-center">Last updated at ${lastTime}</div>
+      `;
+    })
+    .catch(err => console.error('Error fetching total sightings:', err));
+}
+
+// Wire up controls and initial load
+document.addEventListener('DOMContentLoaded', () => {
+  const birdSelect = document.getElementById('birdSelect');
+  const timeRangeSelect = document.getElementById('timeRange');
+  const stationSelect = document.getElementById('stationSelect');
+  const dataExplorer = document.getElementById('dataExplorerContent');
+
+  if (!birdSelect || !timeRangeSelect || !stationSelect || !dataExplorer) return;
+
+  // Initialize sort state
+  fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
+
+  const updateAll = () => {
+    const station = stationSelect.value;
+    const timerange = timeRangeSelect.value;
+    const bird = birdSelect.value;
+
+    fetchUniqueSpecies(parseFloat(localStorage.getItem('confSlider') || 0.5), station);
+    if (bird) {
+     .fetchSightingsByBird(bird, timerange, station);
+    } else {
+      fetchSightingsByTimeRange(timerange, station, fetchSightingsByTimeRange.currentSort);
+    }
+    updateTotalSightings(station);
+  };
+
+  birdSelect.addEventListener('change', updateAll);
+  timeRangeSelect.addEventListener('change', updateAll);
+  stationSelect.addEventListener('change', updateAll);
+
+  // Initial load
+  updateAll();
+});
 
