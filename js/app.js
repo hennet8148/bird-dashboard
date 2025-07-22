@@ -3,7 +3,7 @@
 import { fetchUniqueSpecies } from './stats.js';
 
 // Debounce helper
-en function debounce(fn, delay = 300) {
+function debounce(fn, delay = 300) {
   let timeout;
   return (...args) => {
     clearTimeout(timeout);
@@ -11,6 +11,7 @@ en function debounce(fn, delay = 300) {
   };
 }
 
+// Build a sortable table header cell
 function createSortableHeader(text, key, currentSort, setSort) {
   const th = document.createElement('th');
   th.classList.add(
@@ -37,6 +38,7 @@ function createSortableHeader(text, key, currentSort, setSort) {
   return th;
 }
 
+// Fetch and render sightings aggregated by time range
 function fetchSightingsByTimeRange(timeRange, station = '', sort) {
   const url = `/dashboard/php/get_sightings_by_timerange.php?timerange=${encodeURIComponent(timeRange)}&station=${encodeURIComponent(station)}`;
   fetch(url)
@@ -105,6 +107,57 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
     });
 }
 
+// Fetch and render per-bird sightings
+function fetchSightingsByBird(bird, timeRange, station = '') {
+  const container = document.getElementById('dataExplorerContent');
+  if (!bird) {
+    container.innerHTML = '<p>Please select a bird to see data.</p>';
+    return;
+  }
+
+  const url = `/dashboard/php/get_sightings_by_bird.php?bird=${encodeURIComponent(bird)}&timerange=${encodeURIComponent(timeRange)}&station=${encodeURIComponent(station)}`;
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (!Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p>No sightings found for this bird and time range.</p>';
+        return;
+      }
+
+      const table = document.createElement('table');
+      table.classList.add('min-w-full', 'divide-y', 'divide-gray-200');
+      table.innerHTML = `
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
+          </tr>
+        </thead>
+      `;
+
+      const tbody = document.createElement('tbody');
+      tbody.classList.add('bg-white', 'divide-y', 'divide-gray-200');
+
+      data.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${row.timestamp}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.confidence).toFixed(2)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      table.appendChild(tbody);
+      container.innerHTML = '';
+      container.appendChild(table);
+    })
+    .catch(err => {
+      console.error('Error fetching bird sightings:', err);
+      container.innerHTML = '<p>Failed to load bird data.</p>';
+    });
+}
+
+// Fetch and render total sightings summary
 function updateTotalSightings(station = '') {
   const url = `/dashboard/php/stats.php`;
   const formData = new FormData();
@@ -129,6 +182,7 @@ function updateTotalSightings(station = '') {
     .catch(err => console.error('Error fetching total sightings:', err));
 }
 
+// Wire up controls and initial load
 document.addEventListener('DOMContentLoaded', () => {
   const birdSelect = document.getElementById('birdSelect');
   const timeRangeSelect = document.getElementById('timeRange');
@@ -137,35 +191,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!birdSelect || !timeRangeSelect || !stationSelect || !dataExplorer) return;
 
+  // Initialize sort state
   fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
 
-  birdSelect.addEventListener('change', () => {
+  const updateAll = () => {
     const station = stationSelect.value;
-    const timeRange = timeRangeSelect.value;
+    const timerange = timeRangeSelect.value;
+    const bird = birdSelect.value;
+
     fetchUniqueSpecies(parseFloat(localStorage.getItem('confSlider') || 0.5), station);
-    fetchSightingsByBird(birdSelect.value, timeRange, station);
+    if (bird) {
+      fetchSightingsByBird(bird, timerange, station);
+    } else {
+      fetchSightingsByTimeRange(timerange, station, fetchSightingsByTimeRange.currentSort);
+    }
     updateTotalSightings(station);
-  });
+  };
 
-  timeRangeSelect.addEventListener('change', () => {
-    const station = stationSelect.value;
-    const timeRange = timeRangeSelect.value;
-    fetchSightingsByTimeRange(timeRange, station, fetchSightingsByTimeRange.currentSort);
-    updateTotalSightings(station);
-  });
+  birdSelect.addEventListener('change', updateAll);
+  timeRangeSelect.addEventListener('change', updateAll);
+  stationSelect.addEventListener('change', updateAll);
 
-  stationSelect.addEventListener('change', () => {
-    const station = stationSelect.value;
-    const timeRange = timeRangeSelect.value;
-    fetchUniqueSpecies(parseFloat(localStorage.getItem('confSlider') || 0.5), station);
-    fetchSightingsByTimeRange(timeRange, station, fetchSightingsByTimeRange.currentSort);
-    updateTotalSightings(station);
-  });
-
-  const initStation = stationSelect.value;
-  const initTime = timeRangeSelect.value;
-  fetchUniqueSpecies(parseFloat(localStorage.getItem('confSlider') || 0.5), initStation);
-  fetchSightingsByTimeRange(initTime, initStation, fetchSightingsByTimeRange.currentSort);
-  updateTotalSightings(initStation);
+  // Initial load
+  updateAll();
 });
 
