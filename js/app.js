@@ -3,7 +3,7 @@
 import { fetchUniqueSpecies } from './stats.js';
 
 // Debounce helper
-function debounce(fn, delay = 300) {
+en function debounce(fn, delay = 300) {
   let timeout;
   return (...args) => {
     clearTimeout(timeout);
@@ -45,7 +45,7 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
       const container = document.getElementById('dataExplorerContent');
       container.innerHTML = '';
 
-      if (!data.length) {
+      if (!Array.isArray(data) || data.length === 0) {
         container.textContent = 'No sightings found for this time range.';
         return;
       }
@@ -66,7 +66,7 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
       const trHead = document.createElement('tr');
 
       const currentSort = fetchSightingsByTimeRange.currentSort || { key: 'sightings_count', asc: false };
-      const setSort = (newSort) => {
+      const setSort = newSort => {
         fetchSightingsByTimeRange.currentSort = newSort;
         fetchSightingsByTimeRange(timeRange, station, newSort);
       };
@@ -100,13 +100,11 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
     })
     .catch(err => {
       console.error('Error fetching sightings:', err);
-      document.getElementById('dataExplorerContent').textContent = 'Failed to load data.';
+      const container = document.getElementById('dataExplorerContent');
+      if (container) container.textContent = 'Failed to load data.';
     });
 }
 
-$1
-
-// Fetch & render total sightings summary
 function updateTotalSightings(station = '') {
   const url = `/dashboard/php/stats.php`;
   const formData = new FormData();
@@ -137,36 +135,37 @@ document.addEventListener('DOMContentLoaded', () => {
   const stationSelect = document.getElementById('stationSelect');
   const dataExplorer = document.getElementById('dataExplorerContent');
 
-  const debouncedFetchUniqueSpecies = debounce(fetchUniqueSpecies, 250);
+  if (!birdSelect || !timeRangeSelect || !stationSelect || !dataExplorer) return;
 
-  function updateDataExplorer() {
-    const selectedBird = birdSelect.value;
-    const selectedTime = timeRangeSelect.value;
-    const selectedStation = stationSelect.value;
+  fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
 
-    if (selectedBird) {
-      fetchSightingsByBird(selectedBird, selectedTime, selectedStation);
-    } else {
-      fetchSightingsByTimeRange(selectedTime, selectedStation, fetchSightingsByTimeRange.currentSort);
-    }
-  }
+  birdSelect.addEventListener('change', () => {
+    const station = stationSelect.value;
+    const timeRange = timeRangeSelect.value;
+    fetchUniqueSpecies(parseFloat(localStorage.getItem('confSlider') || 0.5), station);
+    fetchSightingsByBird(birdSelect.value, timeRange, station);
+    updateTotalSightings(station);
+  });
 
-  if (birdSelect && timeRangeSelect && stationSelect && dataExplorer) {
-    birdSelect.addEventListener('change', updateDataExplorer);
-    timeRangeSelect.addEventListener('change', updateDataExplorer);
-    stationSelect.addEventListener('change', () => {
-      const station = stationSelect.value;
-      updateDataExplorer();
-      updateTotalSightings(station);
-    });
+  timeRangeSelect.addEventListener('change', () => {
+    const station = stationSelect.value;
+    const timeRange = timeRangeSelect.value;
+    fetchSightingsByTimeRange(timeRange, station, fetchSightingsByTimeRange.currentSort);
+    updateTotalSightings(station);
+  });
 
-    fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
+  stationSelect.addEventListener('change', () => {
+    const station = stationSelect.value;
+    const timeRange = timeRangeSelect.value;
+    fetchUniqueSpecies(parseFloat(localStorage.getItem('confSlider') || 0.5), station);
+    fetchSightingsByTimeRange(timeRange, station, fetchSightingsByTimeRange.currentSort);
+    updateTotalSightings(station);
+  });
 
-    queueMicrotask(() => {
-      const station = stationSelect.value;
-      updateDataExplorer();
-      updateTotalSightings(station);
-    });
-  }
+  const initStation = stationSelect.value;
+  const initTime = timeRangeSelect.value;
+  fetchUniqueSpecies(parseFloat(localStorage.getItem('confSlider') || 0.5), initStation);
+  fetchSightingsByTimeRange(initTime, initStation, fetchSightingsByTimeRange.currentSort);
+  updateTotalSightings(initStation);
 });
 
