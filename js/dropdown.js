@@ -1,7 +1,9 @@
+// dashboard/js/dropdown.js
+
 document.addEventListener('DOMContentLoaded', () => {
   const birdSelect = document.getElementById('birdSelect');
-  
-  fetch('php/species_list.php')
+
+  fetch('/dashboard/php/species_list.php')
     .then(response => response.json())
     .then(data => {
       if (Array.isArray(data)) {

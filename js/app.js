@@ -1,4 +1,6 @@
-import { updateStatsPanel, fetchUniqueSpecies, fetchYesterdaySpecies } from './stats.js';
+// dashboard/js/app.js
+
+import { updateStatsPanel, fetchUniqueSpecies } from './stats.js';
 
 // Debounce helper
 function debounce(fn, delay = 300) {
@@ -11,7 +13,11 @@ function debounce(fn, delay = 300) {
 
 function createSortableHeader(text, key, currentSort, setSort) {
   const th = document.createElement('th');
-  th.classList.add('px-6', 'py-3', 'text-left', 'text-xs', 'font-medium', 'text-gray-500', 'uppercase', 'tracking-wider', 'cursor-pointer');
+  th.classList.add(
+    'px-6', 'py-3', 'text-left', 'text-xs',
+    'font-medium', 'text-gray-500', 'uppercase',
+    'tracking-wider', 'cursor-pointer'
+  );
   th.textContent = text;
 
   if (currentSort.key === key) {
@@ -32,7 +38,7 @@ function createSortableHeader(text, key, currentSort, setSort) {
 }
 
 function fetchSightingsByTimeRange(timeRange, station = '', sort) {
-  const url = `php/get_sightings_by_timerange.php?timerange=${encodeURIComponent(timeRange)}&station=${encodeURIComponent(station)}`;
+  const url = `/dashboard/php/get_sightings_by_timerange.php?timerange=${encodeURIComponent(timeRange)}&station=${encodeURIComponent(station)}`;
   fetch(url)
     .then(res => res.json())
     .then(data => {
@@ -105,7 +111,7 @@ function fetchSightingsByBird(bird, timeRange, station = '') {
     return;
   }
 
-  const url = `php/get_sightings_by_bird.php?bird=${encodeURIComponent(bird)}&timerange=${encodeURIComponent(timeRange)}&station=${encodeURIComponent(station)}`;
+  const url = `/dashboard/php/get_sightings_by_bird.php?bird=${encodeURIComponent(bird)}&timerange=${encodeURIComponent(timeRange)}&station=${encodeURIComponent(station)}`;
 
   fetch(url)
     .then(res => res.json())
@@ -149,89 +155,13 @@ function fetchSightingsByBird(bird, timeRange, station = '') {
     });
 }
 
-function updateTotalSightings(station = '') {
-  const url = 'php/stats.php';
-  const formData = new FormData();
-  if (station && station !== 'All') {
-    formData.append('station', station);
-  }
-
-  fetch(url, {
-    method: 'POST',
-    body: formData
-  })
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById('totalSightings');
-      if (!container) return;
-
-      const startDate = new Date(data.first_date).toLocaleDateString();
-      const lastTime = new Date(data.last_updated).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZoneName: 'short'
-      });
-
-      container.innerHTML = `
-        <div class="text-sm text-gray-500 text-center mb-1">
-          Total Sightings since ${startDate}
-        </div>
-        <div class="text-3xl font-bold text-center">
-          ${data.total_sightings.toLocaleString()}
-        </div>
-        <hr class="my-2">
-        <div class="text-sm text-gray-500 text-center">
-          Last updated at ${lastTime}
-        </div>
-      `;
-    })
-    .catch(err => {
-      console.error('Error fetching total sightings:', err);
-    });
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   const birdSelect = document.getElementById('birdSelect');
   const timeRangeSelect = document.getElementById('timeRange');
   const stationSelect = document.getElementById('stationSelect');
   const dataExplorer = document.getElementById('dataExplorerContent');
 
-  const confSlider = document.getElementById('confSlider');
-  const confValue = document.getElementById('confValue');
-  const confSliderYesterday = document.getElementById('confSliderYesterday');
-  const confValueYesterday = document.getElementById('confValueYesterday');
-
-  const confVal = parseFloat(localStorage.getItem('confSlider')) || 0.5;
-  const confYesterdayVal = parseFloat(localStorage.getItem('confSliderYesterday')) || 0.5;
-
   const debouncedFetchUniqueSpecies = debounce(fetchUniqueSpecies, 250);
-  const debouncedFetchYesterdaySpecies = debounce(fetchYesterdaySpecies, 250);
-
-  if (confSlider && confValue) {
-    confSlider.value = confVal;
-    confValue.textContent = confVal.toFixed(2);
-    fetchUniqueSpecies(confVal);
-
-    confSlider.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      confValue.textContent = val.toFixed(2);
-      localStorage.setItem('confSlider', val);
-      debouncedFetchUniqueSpecies(val);
-    });
-  }
-
-  if (confSliderYesterday && confValueYesterday) {
-    confSliderYesterday.value = confYesterdayVal;
-    confValueYesterday.textContent = confYesterdayVal.toFixed(2);
-    fetchYesterdaySpecies(confYesterdayVal);
-
-    confSliderYesterday.addEventListener('input', (e) => {
-      const val = parseFloat(e.target.value);
-      confValueYesterday.textContent = val.toFixed(2);
-      localStorage.setItem('confSliderYesterday', val);
-      debouncedFetchYesterdaySpecies(val);
-    });
-  }
 
   function updateDataExplorer() {
     const selectedBird = birdSelect.value;
