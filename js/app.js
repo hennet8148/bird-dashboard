@@ -1,6 +1,6 @@
 // dashboard/js/app.js
 
-import { updateStatsPanel, fetchUniqueSpecies } from './stats.js';
+import { fetchUniqueSpecies } from './stats.js';
 
 // Debounce helper
 function debounce(fn, delay = 300) {
@@ -182,7 +182,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const station = stationSelect.value;
       updateDataExplorer();
       updateTotalSightings(station);
-      updateStatsPanel(station);
     });
 
     fetchSightingsByTimeRange.currentSort = { key: 'sightings_count', asc: false };
@@ -191,9 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const station = stationSelect.value;
       updateDataExplorer();
       updateTotalSightings(station);
-      updateStatsPanel(station);
     });
   }
 });
-
 
