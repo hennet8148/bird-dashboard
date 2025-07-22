@@ -98,7 +98,11 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
       });
 
       table.appendChild(tbody);
-      container.appendChild(table);
+      // wrap wide table to allow horizontal scrolling
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('overflow-x-auto', 'w-full');
+      wrapper.appendChild(table);
+      container.appendChild(wrapper);
     })
     .catch(err => {
       console.error('Error fetching sightings:', err);
@@ -130,7 +134,7 @@ function fetchSightingsByBird(bird, timeRange, station = '') {
         <thead class="bg-gray-50">
           <tr>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
+            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
           </tr>
         </thead>
       `;
