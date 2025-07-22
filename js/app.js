@@ -38,11 +38,10 @@ function createSortableHeader(text, key, currentSort, setSort) {
   return th;
 }
 
-// Wrap element to enforce both horizontal & vertical scrolling within container
+// Wrap element to enforce both horizontal & vertical scrolling
 function wrapScrollable(content) {
   const wrapper = document.createElement('div');
   wrapper.classList.add('overflow-auto', 'w-full', 'h-full');
-  wrapper.style.display = 'block';
   wrapper.appendChild(content);
   return wrapper;
 }
@@ -175,19 +174,5 @@ function updateTotalSightings(station = '') {
   if (station && station !== 'All') formData.append('station', station);
 
   fetch(url, { method: 'POST', body: formData })
-    .then(res => res.json())
-    .then(data => {
-      const container = document.getElementById('totalSightings');
-      if (!container) return;
-
-      const startDate = new Date(data.first_date).toLocaleDateString();
-      const lastTime = new Date(data.last_updated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
-
-      container.innerHTML = `
-        <div class="text-sm text-gray-500 text-center mb-1">Total Sightings since ${startDate}</div>
-        <div class="text-3xl font-bold text-center">${data.total_sightings.toLocaleString()}</div>
-        <hr class="my-2">
-        <div class="text-sm text-gray-500 text-center">Last updated at ${lastTime}</div>
-      `;
-    })
+    .then(res => res.json())\198
 
