@@ -3,7 +3,7 @@ console.log("🟢 card-total-detections.js loaded");
 document.addEventListener("DOMContentLoaded", () => {
   console.log("📦 DOMContentLoaded");
 
-  fetch('https://davidsonfarmbirdproject.org/dashboard/php/get_summary.php')
+  fetch('/dashboard/php/get_summary.php')
     .then(res => {
       console.log("📡 Fetched summary response");
       return res.json();

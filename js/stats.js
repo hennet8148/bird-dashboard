@@ -8,14 +8,13 @@ export function getSelectedStation() {
 
 /**
  * Fetch and render the "Unique Species to Date" card.
- * @param {number} conf  Confidence threshold (0.00–1.00)
- * @param {string} station  Station ID, e.g. 'S1' or 'All'
+ * @param {number} conf   Confidence threshold (0.00–1.00)
+ * @param {string} station Station ID, e.g. 'S1' or 'All'
  */
 export async function fetchUniqueSpecies(conf, station = getSelectedStation()) {
   const statSpecies = document.getElementById('statSpecies');
-  const listEl       = document.getElementById('speciesList');
-  const sliderEl     = document.getElementById('confSlider');
-  const valueLabel   = document.getElementById('confValue');
+  const listEl      = document.getElementById('speciesList');
+  const valueLabel  = document.getElementById('confValue');
 
   try {
     const params = new URLSearchParams({ conf: conf.toFixed(2), station });
@@ -25,7 +24,7 @@ export async function fetchUniqueSpecies(conf, station = getSelectedStation()) {
 
     // Update the big number
     if (statSpecies) {
-      statSpecies.textContent = 
+      statSpecies.textContent =
         data.unique_species_count != null
           ? new Intl.NumberFormat().format(data.unique_species_count)
           : '—';
