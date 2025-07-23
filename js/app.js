@@ -93,7 +93,8 @@ function fetchSightingsByTimeRange(timeRange, station = '', sort) {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-700 underline cursor-pointer">
-            <a href="bird.php?code=${encodeURIComponent(row.species_code)}">${row.species_common_name}</a>
+<a href="/dashboard/bird.php?code=${encodeURIComponent(row.species_code)}">${row.species_common_name}</a>
+
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${row.sightings_count}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${parseFloat(row.avg_confidence).toFixed(2)}</td>
