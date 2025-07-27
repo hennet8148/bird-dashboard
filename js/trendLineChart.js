@@ -1,10 +1,7 @@
 // File: /dashboard/js/trendLineChart.js
 
 export async function renderSpeciesTrendChart(speciesCode) {
-  if (!speciesCode) {
-    console.warn("renderSpeciesTrendChart: no speciesCode provided");
-    return;
-  }
+  if (!speciesCode) return;
 
   try {
     const res = await fetch(
@@ -12,26 +9,25 @@ export async function renderSpeciesTrendChart(speciesCode) {
     );
     if (!res.ok) throw new Error(`API error ${res.status}`);
     const data = await res.json();
+    if (!Array.isArray(data) || !data.length) return;
 
-    if (!Array.isArray(data) || data.length === 0) {
-      console.warn("renderSpeciesTrendChart: no data returned");
-      return;
-    }
+    // Map into { x: Date, y: count } for each station
+    const s1Points = data.map(e => ({
+      x: new Date(e.date),
+      y: Number(e.S1 ?? 0)
+    }));
+    const s2Points = data.map(e => ({
+      x: new Date(e.date),
+      y: Number(e.S2 ?? 0)
+    }));
 
-    // Prepare arrays
-    const labels = data.map((entry) => entry.date);
-    const s1 = data.map((entry) => Number(entry.S1 ?? 0));
-    const s2 = data.map((entry) => Number(entry.S2 ?? 0));
-
-    // Compute total per day if you want them stacked proportionally,
-    // but for true stacked bar, you can leave each series separate.
-    // Compute dynamic Y-axis max:
-    const dailyTotals = s1.map((val, i) => val + s2[i]);
-    const maxTotal = Math.max(...dailyTotals);
+    // Compute Y–axis bounds (as before)
+    const totals = data.map((e,i) => (Number(e.S1 ?? 0) + Number(e.S2 ?? 0)));
+    const maxTotal = Math.max(...totals);
     const magnitude = Math.pow(10, Math.floor(Math.log10(maxTotal)));
     const stepCount = 5;
-    const stepSize = Math.ceil((maxTotal / stepCount) / magnitude) * magnitude;
-    const suggestedMax = Math.ceil(maxTotal / stepSize) * stepSize;
+    const stepSize = Math.ceil((maxTotal/stepCount)/magnitude)*magnitude;
+    const suggestedMax = Math.ceil(maxTotal/stepSize)*stepSize;
 
     const ctx = document.getElementById("speciesTrendChart");
     if (!ctx) return;
@@ -39,49 +35,52 @@ export async function renderSpeciesTrendChart(speciesCode) {
     new Chart(ctx, {
       type: "bar",
       data: {
-        labels,
         datasets: [
           {
             label: "Station S2",
-            data: s2,
-            backgroundColor: "#3b82f6", // Tailwind blue-500
+            data: s2Points,
+            backgroundColor: "#3b82f6",
             stack: "stations",
+            barThickness: "flex",
+            maxBarThickness: 4
           },
           {
             label: "Station S1",
-            data: s1,
-            backgroundColor: "#1f2937", // Tailwind gray-800
+            data: s1Points,
+            backgroundColor: "#1f2937",
             stack: "stations",
-          },
-        ],
+            barThickness: "flex",
+            maxBarThickness: 4
+          }
+        ]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
           x: {
-            title: { display: true, text: "Date" },
+            type: "time",
+            time: {
+              unit: "day",
+              tooltipFormat: "MMM d"
+            },
+            min: new Date("2025-06-24"),
+            max: new Date("2026-06-23"), // 365 days later
             stacked: true,
             ticks: {
-              autoSkip: false,
+              source: "auto",
+              autoSkip: true,
               maxRotation: 0,
-              minRotation: 0,
-              callback: function (value, index) {
-                // show one tick per week
-                return index % 7 === 0 ? this.getLabelForValue(value) : "";
-              },
-            },
+              minRotation: 0
+            }
           },
           y: {
-            title: { display: true, text: "Detections per Day" },
-            stacked: true,
             beginAtZero: true,
             suggestedMax,
-            ticks: {
-              stepSize,
-              callback: (val) => val.toLocaleString(),
-            },
-          },
+            stacked: true,
+            title: { display: true, text: "Detections per Day" },
+            ticks: { stepSize }
+          }
         },
         plugins: {
           legend: { position: "top" },
@@ -89,13 +88,11 @@ export async function renderSpeciesTrendChart(speciesCode) {
             mode: "index",
             intersect: false,
             callbacks: {
-              label: function (context) {
-                return `${context.dataset.label}: ${context.parsed.y}`;
-              },
-            },
-          },
-        },
-      },
+              label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}`
+            }
+          }
+        }
+      }
     });
   } catch (err) {
     console.error("renderSpeciesTrendChart error:", err);

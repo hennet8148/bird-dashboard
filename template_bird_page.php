@@ -6,7 +6,8 @@
   <meta name="description" content="Sightings and data for {{common_name}} at Davidson Farm Bird Project.">
   <title>{{common_name}} | Davidson Farm Bird Project</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- ✅ Add this line -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
 <body class="bg-white text-gray-800">
 
