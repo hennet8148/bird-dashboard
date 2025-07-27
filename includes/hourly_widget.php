@@ -6,12 +6,11 @@
     Values are scaled to fit the box and emphasize active hours.
   </p>
 
-  <!-- Chart container -->
+  <!-- **New canvas container** -->
   <div class="relative" style="height:200px;">
     <canvas id="hourlyWidget"></canvas>
   </div>
-
-  <!-- Summary footer (will be filled by JS) -->
+  <!-- Summary text will go here -->
   <div id="hourlyWidgetSummary" class="mt-4 text-[10px] text-gray-600 text-center"></div>
 </div>
 
