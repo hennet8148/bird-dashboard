@@ -3,55 +3,71 @@
 export async function renderHourlyWidget(speciesCode) {
   if (!speciesCode) return;
 
-  const res = await fetch(`/dashboard/php/get_hourly_distribution.php?species_code=${speciesCode}`);
-  if (!res.ok) return;
+  try {
+    const res = await fetch(`/dashboard/php/get_hourly_distribution.php?species_code=${speciesCode}`);
+    if (!res.ok) throw new Error(`API error ${res.status}`);
+    const { hourly_counts, total_detections, average_confidence, max_confidence } = await res.json();
 
-  const {
-    hourly_counts,
-    total_detections,
-    average_confidence,
-    max_confidence
-  } = await res.json();
+    // Prepare labels (00–23) and corresponding counts
+    const labels = [];
+    const counts = [];
+    for (let i = 0; i < 24; i++) {
+      const hour = String(i).padStart(2, "0");
+      labels.push(hour);
+      counts.push(hourly_counts[hour] || hourly_counts[String(i)] || 0);
+    }
 
-  const widget = document.getElementById("hourlyWidget");
-  if (!widget) return;
+    // Render Chart.js bar chart
+    const ctx = document.getElementById("hourlyWidget").getContext("2d");
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Detections",
+          data: counts,
+          backgroundColor: "#3b82f6",  // Tailwind blue-500
+          borderRadius: 4,
+          barPercentage: 0.6,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            title: { display: true, text: "Hour (00–23)" },
+            ticks: { autoSkip: false }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Detections" },
+            ticks: {
+              precision: 0,
+              callback: v => v.toLocaleString()
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.parsed.y} detections`
+            }
+          }
+        }
+      }
+    });
 
-  // Normalize keys to 0–23
-  const counts = {};
-  for (let i = 0; i < 24; i++) {
-    const key = String(i);
-    counts[i] = hourly_counts[key] || hourly_counts[key.padStart(2, "0")] || 0;
+    // Append summary footer
+    const summaryEl = document.getElementById("hourlyWidgetSummary");
+    if (summaryEl) {
+      summaryEl.textContent = 
+        `Based on ${total_detections.toLocaleString()} detections — average confidence: ${average_confidence}, max: ${max_confidence}`;
+    }
+
+  } catch (err) {
+    console.error("renderHourlyWidget error:", err);
   }
-
-  const max = Math.max(...Object.values(counts));
-  const container = document.createElement("div");
-  container.className = "space-y-[2px]";
-
-  for (let i = 0; i < 24; i++) {
-    const row = document.createElement("div");
-    row.className = "flex items-center space-x-2";
-
-    const label = document.createElement("div");
-    label.textContent = String(i).padStart(2, "0");
-    label.className = "w-6 text-right text-[10px] text-gray-600";
-
-    const bar = document.createElement("div");
-    const relWidth = max ? Math.round((counts[i] / max) * 100) : 0;
-    bar.className = `h-3 bg-gray-700 rounded`;
-    bar.style.width = `${relWidth}%`;
-
-    row.appendChild(label);
-    row.appendChild(bar);
-    container.appendChild(row);
-  }
-
-  // Summary footer
-  const footer = document.createElement("p");
-  footer.className = "mt-4 text-[10px] text-gray-600 text-center";
-  footer.textContent = `Based on ${total_detections} detections — average confidence: ${average_confidence}, max: ${max_confidence}`;
-
-  widget.innerHTML = "";
-  widget.appendChild(container);
-  widget.appendChild(footer);
 }
 

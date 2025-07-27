@@ -5,7 +5,14 @@
     Relative number of detections per hour for <strong><?php echo htmlspecialchars($_GET['common_name'] ?? '') ?></strong>.
     Values are scaled to fit the box and emphasize active hours.
   </p>
-  <div id="hourlyWidget" class="text-xs"></div>
+
+  <!-- Chart container -->
+  <div class="relative" style="height:200px;">
+    <canvas id="hourlyWidget"></canvas>
+  </div>
+
+  <!-- Summary footer (will be filled by JS) -->
+  <div id="hourlyWidgetSummary" class="mt-4 text-[10px] text-gray-600 text-center"></div>
 </div>
 
 <script type="module">
