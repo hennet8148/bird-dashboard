@@ -6,10 +6,11 @@
   <meta name="description" content="Sightings and data for {{common_name}} at Davidson Farm Bird Project.">
   <title>{{common_name}} | Davidson Farm Bird Project</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- ✅ Add this line -->
 </head>
 <body class="bg-white text-gray-800">
 
-  <!-- Inject species code early so calendar.php can pick it up -->
+  <!-- Inject species code early so all components can pick it up -->
   <script>
     window.speciesCode = "{{species_code}}";
   </script>
@@ -43,13 +44,18 @@
     </div>
   </div>
 
+  <!-- Daily detection trend chart block -->
+  <div class="mt-10 flex justify-center">
+    <?php include __DIR__ . '/../includes/daily_trend_chart.php'; ?>
+  </div>
+
   <!-- Hourly detection widget block -->
   <div class="mt-10 flex justify-center">
     <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
       <div class="w-[412px]">
         <p class="text-sm mb-3 text-gray-700 text-center">
- Hourly audio detections for <strong>{{common_name}}</strong> since June 24, 2025. 
-  For species with fewer strong matches, lower-confidence detections may be shown to reveal broader patterns.
+          Hourly audio detections for <strong>{{common_name}}</strong> since June 24, 2025. 
+          For species with fewer strong matches, lower-confidence detections may be shown to reveal broader patterns.
         </p>
         <div id="hourlyChart" class="text-xs">
           <!-- 📊 Hourly Chart Layout Placeholder -->
