@@ -16,13 +16,17 @@ export async function renderSpeciesTrendChart(speciesCode) {
       return;
     }
 
+    // Prepare data arrays
     const labels = data.map(entry => entry.date);
     const s1 = data.map(entry => Number(entry.S1 ?? 0));
     const s2 = data.map(entry => Number(entry.S2 ?? 0));
 
-    // Dynamically calculate max value across both series
+    // Compute dynamic Y-axis bounds
     const maxY = Math.max(...s1, ...s2);
-    const suggestedMax = Math.ceil(maxY * 1.1); // Add 10% headroom
+    const magnitude = Math.pow(10, Math.floor(Math.log10(maxY)));
+    const stepCount = 5; // Aim for 5 tick steps
+    const stepSize = Math.ceil((maxY / stepCount) / magnitude) * magnitude;
+    const suggestedMax = Math.ceil(maxY / stepSize) * stepSize;
 
     const ctx = document.getElementById("speciesTrendChart");
     if (!ctx) return;
@@ -35,7 +39,7 @@ export async function renderSpeciesTrendChart(speciesCode) {
           {
             label: "Station S1",
             data: s1,
-            borderColor: "#1f2937", // Tailwind gray-800
+            borderColor: "#1f2937",
             backgroundColor: "rgba(31, 41, 55, 0.1)",
             borderWidth: 2,
             pointRadius: 0,
@@ -44,7 +48,7 @@ export async function renderSpeciesTrendChart(speciesCode) {
           {
             label: "Station S2",
             data: s2,
-            borderColor: "#3b82f6", // Tailwind blue-500
+            borderColor: "#3b82f6",
             backgroundColor: "rgba(59, 130, 246, 0.1)",
             borderWidth: 2,
             pointRadius: 0,
@@ -63,7 +67,7 @@ export async function renderSpeciesTrendChart(speciesCode) {
               maxRotation: 0,
               minRotation: 0,
               callback: function(value, index) {
-                // Show one label per week to avoid clutter
+                // Show one label per week
                 return index % 7 === 0 ? this.getLabelForValue(value) : '';
               }
             }
@@ -71,11 +75,11 @@ export async function renderSpeciesTrendChart(speciesCode) {
           y: {
             beginAtZero: true,
             suggestedMax,
-            title: { display: true, text: "Detections per Day" },
             ticks: {
-              precision: 0,
-              callback: (value) => value.toLocaleString()
-            }
+              stepSize,
+              callback: val => val.toLocaleString()
+            },
+            title: { display: true, text: "Detections per Day" }
           }
         },
         plugins: {
