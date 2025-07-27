@@ -17,8 +17,8 @@ export async function renderSpeciesTrendChart(speciesCode) {
     }
 
     const labels = data.map(entry => entry.date);
-    const s1 = data.map(entry => entry.S1 ?? 0);
-    const s2 = data.map(entry => entry.S2 ?? 0);
+    const s1 = data.map(entry => Number(entry.S1 ?? 0));
+    const s2 = data.map(entry => Number(entry.S2 ?? 0));
 
     // Dynamically calculate max value across both series
     const maxY = Math.max(...s1, ...s2);
@@ -59,14 +59,12 @@ export async function renderSpeciesTrendChart(speciesCode) {
           x: {
             title: { display: true, text: "Date" },
             ticks: {
-              maxRotation: 45,
-              minRotation: 45,
               autoSkip: false,
-              maxTicksLimit: 365,
-              callback: function(value, index, ticks) {
-                // Show every 30th label if too crowded
-                const step = Math.ceil(labels.length / 30);
-                return index % step === 0 ? labels[index] : '';
+              maxRotation: 0,
+              minRotation: 0,
+              callback: function(value, index) {
+                // Show one label per week to avoid clutter
+                return index % 7 === 0 ? this.getLabelForValue(value) : '';
               }
             }
           },
@@ -81,7 +79,7 @@ export async function renderSpeciesTrendChart(speciesCode) {
           }
         },
         plugins: {
-          legend: { display: true },
+          legend: { display: true, position: 'top' },
           tooltip: {
             mode: "index",
             intersect: false,
