@@ -60,14 +60,27 @@ export async function renderSpeciesTrendChart(speciesCode) {
             }
           },
           y: {
-            title: { display: true, text: "Detections per Day" },
-            beginAtZero: true,
-            ticks: { precision: 0 }
+            type: 'logarithmic',
+            min: 1,
+            title: { display: true, text: "Detections per Day (Log Scale)" },
+            ticks: {
+              callback: function(value) {
+                return Number(value).toLocaleString(); // format: 1, 10, 100, 1000
+              }
+            }
           }
         },
         plugins: {
           legend: { display: true },
-          tooltip: { mode: "index", intersect: false }
+          tooltip: {
+            mode: "index",
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                return `${context.dataset.label}: ${context.parsed.y}`;
+              }
+            }
+          }
         }
       }
     });
