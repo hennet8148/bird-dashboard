@@ -20,6 +20,10 @@ export async function renderSpeciesTrendChart(speciesCode) {
     const s1 = data.map(entry => entry.S1 ?? 0);
     const s2 = data.map(entry => entry.S2 ?? 0);
 
+    // Dynamically calculate max value across both series
+    const maxY = Math.max(...s1, ...s2);
+    const suggestedMax = Math.ceil(maxY * 1.1); // Add 10% headroom
+
     const ctx = document.getElementById("speciesTrendChart");
     if (!ctx) return;
 
@@ -55,18 +59,24 @@ export async function renderSpeciesTrendChart(speciesCode) {
           x: {
             title: { display: true, text: "Date" },
             ticks: {
-              maxTicksLimit: 12,
-              autoSkip: true,
+              maxRotation: 45,
+              minRotation: 45,
+              autoSkip: false,
+              maxTicksLimit: 365,
+              callback: function(value, index, ticks) {
+                // Show every 30th label if too crowded
+                const step = Math.ceil(labels.length / 30);
+                return index % step === 0 ? labels[index] : '';
+              }
             }
           },
           y: {
-            type: 'logarithmic',
-            min: 1,
-            title: { display: true, text: "Detections per Day (Log Scale)" },
+            beginAtZero: true,
+            suggestedMax,
+            title: { display: true, text: "Detections per Day" },
             ticks: {
-              callback: function(value) {
-                return Number(value).toLocaleString(); // format: 1, 10, 100, 1000
-              }
+              precision: 0,
+              callback: (value) => value.toLocaleString()
             }
           }
         },
