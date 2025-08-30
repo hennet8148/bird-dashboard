@@ -7,7 +7,7 @@ require_once 'db.php';
 require_once 'config.php'; // for debug_log()
 
 $timeRange = $_GET['timerange'] ?? 'last_hour';
-$station = $_GET['station'] ?? null;
+$station   = $_GET['station']   ?? null;
 
 // Debug log incoming parameters
 debug_log("get_sightings_by_timerange.php → timerange = $timeRange, station = " . ($station ?? 'NULL'));
@@ -35,8 +35,8 @@ switch ($timeRange) {
 
 $params = [];
 
-// Station filter logic
-if ($station && in_array($station, ['S1', 'S2'])) {
+// Station filter logic (accept any non-empty station value; "" = All Stations)
+if (!empty($station)) {
     $stationCondition = "AND s.location = :station";
     $params[':station'] = $station;
 } else {
