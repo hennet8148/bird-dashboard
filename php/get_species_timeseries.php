@@ -32,7 +32,7 @@ $stmt = $pdo->prepare($sql);
 $stmt->execute(['code' => $species_code]);
 $raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Initialize one entry per day with zeroes for both stations
+// Initialize one entry per day with zeroes for all stations
 $grouped = [];
 foreach ($raw as $row) {
   $date = $row['date'];
@@ -43,10 +43,14 @@ foreach ($raw as $row) {
     $grouped[$date] = [
       'date' => $date,
       'S1'   => 0,
-      'S2'   => 0
+      'S2'   => 0,
+      'S3'   => 0
     ];
   }
-  $grouped[$date][$station] = $count;
+
+  if (in_array($station, ['S1', 'S2', 'S3'])) {
+    $grouped[$date][$station] = $count;
+  }
 }
 
 // Emit as a simple indexed array
