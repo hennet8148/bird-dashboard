@@ -35,8 +35,8 @@ switch ($timeRange) {
 
 $params = [];
 
-// ✅ Updated station filter logic to include S3 and future stations
-if ($station && $station !== 'All') {
+// ✅ Corrected station filter logic
+if (!empty($station)) {
     $stationCondition = "AND s.location = :station";
     $params[':station'] = $station;
 } else {
