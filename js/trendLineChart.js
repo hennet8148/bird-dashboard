@@ -20,14 +20,20 @@ export async function renderSpeciesTrendChart(speciesCode) {
       x: new Date(e.date),
       y: Number(e.S2 ?? 0)
     }));
+    const s3Points = data.map(e => ({
+      x: new Date(e.date),
+      y: Number(e.S3 ?? 0)
+    }));
 
-    // Compute Y–axis bounds (as before)
-    const totals = data.map((e,i) => (Number(e.S1 ?? 0) + Number(e.S2 ?? 0)));
+    // Compute Y–axis bounds (including S3)
+    const totals = data.map(e =>
+      Number(e.S1 ?? 0) + Number(e.S2 ?? 0) + Number(e.S3 ?? 0)
+    );
     const maxTotal = Math.max(...totals);
-    const magnitude = Math.pow(10, Math.floor(Math.log10(maxTotal)));
+    const magnitude = Math.pow(10, Math.floor(Math.log10(maxTotal || 1)));
     const stepCount = 5;
-    const stepSize = Math.ceil((maxTotal/stepCount)/magnitude)*magnitude;
-    const suggestedMax = Math.ceil(maxTotal/stepSize)*stepSize;
+    const stepSize = Math.ceil((maxTotal / stepCount) / magnitude) * magnitude;
+    const suggestedMax = Math.ceil(maxTotal / stepSize) * stepSize;
 
     const ctx = document.getElementById("speciesTrendChart");
     if (!ctx) return;
@@ -36,6 +42,14 @@ export async function renderSpeciesTrendChart(speciesCode) {
       type: "bar",
       data: {
         datasets: [
+          {
+            label: "Station S3",
+            data: s3Points,
+            backgroundColor: "#ef4444", // Tailwind red-500
+            stack: "stations",
+            barThickness: "flex",
+            maxBarThickness: 4
+          },
           {
             label: "Station S2",
             data: s2Points,
