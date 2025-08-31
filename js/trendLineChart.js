@@ -13,15 +13,15 @@ export async function renderSpeciesTrendChart(speciesCode) {
 
     // Map into { x: Date, y: count } for each station
     const s1Points = data.map(e => ({
-      x: new Date(e.date),
+      x: new Date(e.date + "T12:00:00Z"),
       y: Number(e.S1 ?? 0)
     }));
     const s2Points = data.map(e => ({
-      x: new Date(e.date),
+      x: new Date(e.date + "T12:00:00Z"),
       y: Number(e.S2 ?? 0)
     }));
     const s3Points = data.map(e => ({
-      x: new Date(e.date),
+      x: new Date(e.date + "T12:00:00Z"),
       y: Number(e.S3 ?? 0)
     }));
 
