@@ -35,7 +35,7 @@
     <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
       <div class="w-[412px]">
         <p class="text-sm mb-3 text-gray-700 text-center">
-          This calendar shows the days that <strong>{{common_name}}</strong> has been detected with a confidence of <strong>0.50 or greater</strong>. Black-highlighted days indicate confirmed detections. Detections started June 24, 2025 for this project.
+          This calendar shows the days that <strong>{{common_name}}</strong> has been detected with a confidence of <strong>0.50 or greater</strong>. Black-highlighted days indicate days with detections of .5 or above. Detections started June 24, 2025 for this project.
         </p>
         <div id="speciesDashboard" class="text-xs">
           <!-- 🗓️ Real Calendar Layout -->
