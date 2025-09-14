@@ -8,30 +8,25 @@
   include(__DIR__ . '/../includes/static-header.php');
 ?>
 
-<!-- Inject species code early so all components can pick it up -->
 <script>
   window.speciesCode = "<?php echo $species_code; ?>";
 </script>
 
 <div class="max-w-5xl mx-auto p-6">
 
-  <!-- Optional "back" link -->
   <div class="mb-4">
     <a href="/dashboard/species.html" class="text-sm text-blue-600 hover:underline">&larr; Browse all species</a>
   </div>
 
-  <!-- Heading -->
   <h1 class="text-3xl font-serif mt-2 mb-1"><?php echo $species_common_name; ?></h1>
   <p class="text-gray-600 italic text-lg mb-4"><?php echo $scientific_name; ?></p>
 
-  <!-- Orientation block for first-time visitors -->
   <div class="bg-blue-50 border border-blue-100 text-sm text-gray-700 p-4 rounded mb-6 leading-relaxed">
     You’ve landed on a species-specific page from the <strong>Davidson Farm Bird Project</strong>, a passive acoustic monitoring system that listens for bird vocalizations 24/7 using AI.
     <br><br>
     Below, you’ll find visualizations showing when the <strong><?php echo $species_common_name; ?></strong> has been detected on our northeastern Pennsylvania farm — including daily presence, hourly patterns, and historical trends.
   </div>
 
-  <!-- External Learn More link -->
   <p class="mb-8">
     Learn more about this species at:
     <a href="<?php echo $aab_url; ?>" class="text-blue-600 underline" target="_blank">
@@ -39,7 +34,7 @@
     </a>
   </p>
 
-  <!-- Tight calendar block -->
+  <!-- Calendar block -->
   <div class="border-t pt-6 mt-6 flex justify-center">
     <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
       <div class="w-[412px]">
