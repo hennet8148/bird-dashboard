@@ -1,11 +1,11 @@
 <?php
 $sites = [
-  'https://www.speedlimit25.com'      => 'Speed Limit 25',
-  'https://www.hardtimesguitar.com'   => 'Hard Times Guitar Company',
-  'https://feedingcrows.tech'         => 'Feeding Crows Tech',
+  'https://www.speedlimit25.com'        => 'Speed Limit 25',
+  'https://www.hardtimesguitar.com'     => 'Hard Times Guitar Company',
+  'https://feedingcrows.tech'           => 'Feeding Crows Tech',
   'https://davidsonfarmbirdproject.org' => 'Davidson Farm Bird Project',
 ];
-$current = $_SERVER['HTTP_HOST'] ?? '';
+$current_host = $_SERVER['HTTP_HOST'] ?? '';
 ?>
 
 </main>
@@ -29,15 +29,15 @@ $current = $_SERVER['HTTP_HOST'] ?? '';
             <ul class="flex flex-col items-center gap-2 sm:flex-row sm:gap-3">
               <?php
               $first = true;
-              foreach ($sites as $key => $site) {
-                if (strpos($current_host, parse_url($site['url'], PHP_URL_HOST)) !== false) {
-                  continue;
+              foreach ($sites as $url => $label) {
+                if (strpos($current_host, parse_url($url, PHP_URL_HOST)) !== false) {
+                  continue; // skip current site
                 }
                 if (!$first) {
                   echo '<li class="hidden sm:inline opacity-40">·</li>';
                 }
                 $first = false;
-                echo '<li><a class="underline-offset-4 hover:underline" href="' . esc_url($site['url']) . '">' . esc_html($site['name']) . '</a></li>';
+                echo '<li><a class="underline-offset-4 hover:underline" href="' . $url . '">' . $label . '</a></li>';
               }
               ?>
             </ul>
