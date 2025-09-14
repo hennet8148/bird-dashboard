@@ -14,9 +14,6 @@
 
 <div class="max-w-5xl mx-auto p-6">
 
-  <div class="mb-4">
-    <a href="/dashboard/species.html" class="text-sm text-blue-600 hover:underline">&larr; Browse all species</a>
-  </div>
 
   <h1 class="text-3xl font-serif mt-2 mb-1"><?php echo $species_common_name; ?></h1>
   <p class="text-gray-600 italic text-lg mb-4"><?php echo $scientific_name; ?></p>
@@ -70,12 +67,11 @@
   </div>
 
   <!-- Footer links -->
-  <div class="mt-12 text-sm text-center text-gray-500 border-t pt-6">
-    <p class="mb-2">Explore more:</p>
-    <a href="/dashboard/species.html" class="text-blue-600 hover:underline mx-2">All species</a> |
-    <a href="/dashboard/index.html" class="text-blue-600 hover:underline mx-2">Main Dashboard</a> |
-    <a href="/" class="text-blue-600 hover:underline mx-2">DFBP Home</a>
-  </div>
+<div class="mt-12 text-sm text-center text-gray-500 border-t pt-6">
+  <p class="mb-2">Explore more:</p>
+  <a href="https://davidsonfarmbirdproject.org/data-explorer/" class="text-blue-600 hover:underline mx-2">Main Dashboard</a> |
+  <a href="/" class="text-blue-600 hover:underline mx-2">DFBP Home</a>
+</div>
 
 </div>
 
