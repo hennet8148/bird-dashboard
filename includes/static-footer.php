@@ -15,7 +15,7 @@ $current_host = $_SERVER['HTTP_HOST'] ?? '';
     <div class="flex justify-center">
       <div
         class="bg-neutral-900 text-white
-               rounded-full
+               rounded-2xl 
                px-7 py-3
                shadow-sm ring-1 ring-white/10"
         aria-label="Other projects and copyright"
