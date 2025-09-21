@@ -5,20 +5,20 @@ require_once 'db.php';
 require_once 'config.php';
 
 try {
-    $sql = "SELECT 
-                COUNT(*) AS total_sightings,
-                COUNT(DISTINCT species_common_name) AS total_species
-            FROM sightings";
-    $params = [];
-
-    if (!empty($station_id)) {
-        $sql .= " WHERE location = :station_id";
-        $params[':station_id'] = $station_id;
+    if (!empty($station) && strtolower($station) !== 'all') {
+        $stmt = $pdo->prepare("SELECT total_count AS total_sightings FROM station_counts WHERE location = :station");
+        $stmt->execute([':station' => $station]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    } else {
+        $stmt = $pdo->prepare("SELECT total_count AS total_sightings FROM station_counts WHERE location = 'ALL'");
+        $stmt->execute();
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute($params);
-    $summary = $stmt->fetch(PDO::FETCH_ASSOC);
+    // force integer output
+    $summary = [
+        'total_sightings' => intval($row['total_sightings'])
+    ];
 
     echo json_encode($summary);
 
