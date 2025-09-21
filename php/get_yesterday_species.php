@@ -25,7 +25,6 @@ $sqlList = "
   WHERE confidence >= :conf
     AND timestamp >= :yesterday_start
     AND timestamp < :yesterday_end
-  ORDER BY species_common_name ASC
 ";
 
 $params = [
@@ -39,6 +38,9 @@ if (!empty($station) && strtolower($station) !== 'all') {
     $sqlList  .= " AND location = :station";
     $params[':station'] = $station;
 }
+
+// Append ORDER BY *after* possible station filter
+$sqlList .= " ORDER BY species_common_name ASC";
 
 try {
     // Fetch count
