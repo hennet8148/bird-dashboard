@@ -1,4 +1,21 @@
 // dashboard/js/speciesListToggle.js
+console.log("🟢 speciesListToggle.js loaded");
+
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("✅ DOMContentLoaded fired in speciesListToggle.js");
+
+  const toggleButton = document.getElementById('toggleSpeciesList');
+  console.log("Found toggleButton:", toggleButton);
+
+  if (!toggleButton) {
+    console.error("❌ toggleSpeciesList not found");
+    return;
+  }
+
+  toggleButton.addEventListener('click', () => {
+    console.log("✅ speciesListToggle.js: button clicked");
+  });
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   const toggleButton   = document.getElementById('toggleSpeciesList');
