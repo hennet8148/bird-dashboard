@@ -4,14 +4,23 @@ header('Content-Type: application/json');
 require_once 'db.php';
 require_once 'config.php'; // gets $station
 
-$whereStation = $station ? " AND location = " . $pdo->quote($station) : "";
 $table = 'sightings';
 
 try {
-    // Total sightings
-    $totalSightings = $pdo->query("SELECT COUNT(*) FROM $table WHERE 1=1 $whereStation")->fetchColumn();
+    // Total sightings (now from station_counts)
+    if (!empty($station) && strtolower($station) !== 'all') {
+        $stmt = $pdo->prepare("SELECT total_count FROM station_counts WHERE location = :station");
+        $stmt->execute([':station' => $station]);
+        $totalSightings = $stmt->fetchColumn();
+    } else {
+        // All stations
+        $stmt = $pdo->prepare("SELECT total_count FROM station_counts WHERE location = 'ALL'");
+        $stmt->execute();
+        $totalSightings = $stmt->fetchColumn();
+    }
 
-    // Total unique species
+    // Total unique species (still from sightings)
+    $whereStation = $station ? " AND location = " . $pdo->quote($station) : "";
     $totalSpecies = $pdo->query("SELECT COUNT(DISTINCT species_common_name) FROM $table WHERE 1=1 $whereStation")->fetchColumn();
 
     // Most recent detection
@@ -51,8 +60,8 @@ try {
     }
 
     echo json_encode([
-        'total_sightings' => $totalSightings,
-        'total_species' => $totalSpecies,
+        'total_sightings' => intval($totalSightings),
+        'total_species' => intval($totalSpecies),
         'yesterday_species' => $speciesCounts,
         'last_updated' => $lastUpdated,
         'first_date' => $firstDate
