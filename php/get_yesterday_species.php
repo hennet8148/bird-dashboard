@@ -6,26 +6,32 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/config.php'; // gives $pdo, $station
 
 $conf = isset($_GET['conf']) ? floatval($_GET['conf']) : 0.5;
-$yesterday = date('Y-m-d', strtotime('-1 day'));
+
+// Compute yesterday start and end timestamps
+$yesterdayStart = date('Y-m-d 00:00:00', strtotime('-1 day'));
+$yesterdayEnd   = date('Y-m-d 00:00:00'); // today at midnight
 
 $sqlCount = "
   SELECT COUNT(DISTINCT species_common_name) AS count
   FROM sightings
   WHERE confidence >= :conf
-    AND DATE(timestamp) = :yesterday
+    AND timestamp >= :yesterday_start
+    AND timestamp < :yesterday_end
 ";
 
 $sqlList = "
   SELECT DISTINCT species_common_name
   FROM sightings
   WHERE confidence >= :conf
-    AND DATE(timestamp) = :yesterday
+    AND timestamp >= :yesterday_start
+    AND timestamp < :yesterday_end
   ORDER BY species_common_name ASC
 ";
 
 $params = [
     ':conf' => $conf,
-    ':yesterday' => $yesterday,
+    ':yesterday_start' => $yesterdayStart,
+    ':yesterday_end'   => $yesterdayEnd,
 ];
 
 if (!empty($station) && strtolower($station) !== 'all') {
