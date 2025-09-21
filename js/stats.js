@@ -50,6 +50,15 @@ export async function fetchUniqueSpecies(conf, station = getSelectedStation()) {
   }
 }
 
+// Simple debounce helper
+function debounce(fn, delay = 300) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+}
+
 // On page load, kick off the first fetch at the default slider value
 document.addEventListener('DOMContentLoaded', () => {
   const slider = document.getElementById('confSlider');
@@ -58,10 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const initialConf = parseFloat(slider.value) || 0.5;
   fetchUniqueSpecies(initialConf);
 
-  // Also listen for slider changes to re-fetch
+  // Debounced re-fetch when slider moves
+  const debouncedFetch = debounce((conf) => fetchUniqueSpecies(conf), 300);
+
   slider.addEventListener('input', () => {
     const conf = parseFloat(slider.value);
-    fetchUniqueSpecies(conf);
+    debouncedFetch(conf);
   });
 });
 
