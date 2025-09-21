@@ -10,7 +10,7 @@
 
   <!-- Hidden List -->
   <div id="speciesListContainerYesterday"
-       class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700">
+       class="transition-all duration-300 ease-in-out max-h-0 overflow-hidden opacity-0 mt-2 text-sm text-gray-700 overflow-y-auto max-h-40 border-t pt-2">
     <ul id="speciesListYesterday" class="list-disc list-inside space-y-1 px-4 text-left"></ul>
   </div>
 
