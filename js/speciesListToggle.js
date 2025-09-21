@@ -1,29 +1,33 @@
 // dashboard/js/speciesListToggle.js
 
 document.addEventListener('DOMContentLoaded', () => {
-  // All‑time elements only
   const toggleButton   = document.getElementById('toggleSpeciesList');
   const listContainer  = document.getElementById('speciesListContainer');
   const listElement    = document.getElementById('speciesList');
   const confSlider     = document.getElementById('confSlider');
   const confValue      = document.getElementById('confValue');
 
-  // Safety check: if any element is missing, abort
   if (!(toggleButton && listContainer && listElement && confSlider && confValue)) {
     console.error('Toggle list: Required elements not found.');
     return;
   }
 
-  // Toggle show/hide of the species list
+  // ✅ Toggle show/hide using Tailwind classes
   toggleButton.addEventListener('click', () => {
-    const isOpen = listContainer.style.maxHeight && listContainer.style.maxHeight !== '0px';
-    listContainer.style.maxHeight = isOpen ? '0' : `${listElement.scrollHeight}px`;
-    listContainer.style.opacity   = isOpen ? '0' : '1';
-    toggleButton.textContent      = isOpen ? 'Show List ▼' : 'Hide List ▲';
+    const isClosed = listContainer.classList.contains('max-h-0');
+    if (isClosed) {
+      listContainer.classList.remove('max-h-0', 'opacity-0');
+      listContainer.classList.add('max-h-96', 'opacity-100');
+      toggleButton.textContent = 'Hide List ▲';
+    } else {
+      listContainer.classList.remove('max-h-96', 'opacity-100');
+      listContainer.classList.add('max-h-0', 'opacity-0');
+      toggleButton.textContent = 'Show List ▼';
+    }
   });
 
-  // On slider change, re-fetch and update the list
-  confSlider.addEventListener('input', () => {
+  // ✅ Update label + fetch new species on slider change
+  confSlider.addEventListener('change', () => {
     const threshold = parseFloat(confSlider.value).toFixed(2);
     confValue.textContent = threshold;
 
