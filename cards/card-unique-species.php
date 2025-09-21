@@ -1,4 +1,4 @@
-<div class="bg-white p-4 rounded shadow text-center">
+<div class="bg-white p-4 rounded shadow text-center border border-gray-200">
   <p class="text-sm text-gray-500">Unique Species to date</p>
   <p id="statSpecies" class="text-2xl font-bold">Loading…</p>
 
