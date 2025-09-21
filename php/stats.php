@@ -7,23 +7,19 @@ require_once 'config.php'; // gets $station
 $table = 'sightings';
 
 try {
-    // Total sightings (now from station_counts)
+    // Total sightings (from station_counts)
     if (!empty($station) && strtolower($station) !== 'all') {
         $stmt = $pdo->prepare("SELECT total_count FROM station_counts WHERE location = :station");
         $stmt->execute([':station' => $station]);
         $totalSightings = $stmt->fetchColumn();
     } else {
-        // All stations
         $stmt = $pdo->prepare("SELECT total_count FROM station_counts WHERE location = 'ALL'");
         $stmt->execute();
         $totalSightings = $stmt->fetchColumn();
     }
 
-    // Total unique species (still from sightings)
-    $whereStation = $station ? " AND location = " . $pdo->quote($station) : "";
-    $totalSpecies = $pdo->query("SELECT COUNT(DISTINCT species_common_name) FROM $table WHERE 1=1 $whereStation")->fetchColumn();
-
     // Most recent detection
+    $whereStation = $station ? " AND location = " . $pdo->quote($station) : "";
     $stmt = $pdo->query("SELECT MAX(timestamp) FROM $table WHERE timestamp IS NOT NULL $whereStation");
     $lastUpdated = $stmt->fetchColumn();
 
@@ -61,7 +57,7 @@ try {
 
     echo json_encode([
         'total_sightings' => intval($totalSightings),
-        'total_species' => intval($totalSpecies),
+        // 'total_species' => removed
         'yesterday_species' => $speciesCounts,
         'last_updated' => $lastUpdated,
         'first_date' => $firstDate
