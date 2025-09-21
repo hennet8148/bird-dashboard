@@ -12,16 +12,16 @@ $station   = $_GET['station']   ?? null;
 // Debug log incoming parameters
 debug_log("get_sightings_by_timerange.php → timerange = $timeRange, station = " . ($station ?? 'NULL'));
 
-// Time filter logic
+// Time filter logic (use range conditions to make idx_timestamp usable)
 switch ($timeRange) {
     case 'last_hour':
         $timeCondition = "s.timestamp >= NOW() - INTERVAL 1 HOUR";
         break;
     case 'today':
-        $timeCondition = "DATE(s.timestamp) = CURDATE()";
+        $timeCondition = "s.timestamp >= CURDATE() AND s.timestamp < CURDATE() + INTERVAL 1 DAY";
         break;
     case 'yesterday':
-        $timeCondition = "DATE(s.timestamp) = CURDATE() - INTERVAL 1 DAY";
+        $timeCondition = "s.timestamp >= CURDATE() - INTERVAL 1 DAY AND s.timestamp < CURDATE()";
         break;
     case 'last_week':
         $timeCondition = "s.timestamp >= NOW() - INTERVAL 7 DAY";
@@ -36,7 +36,7 @@ switch ($timeRange) {
 $params = [];
 
 // Station filter logic (accept any non-empty station value; "" = All Stations)
-if (!empty($station)) {
+if (!empty($station) && strtolower($station) !== 'all') {
     $stationCondition = "AND s.location = :station";
     $params[':station'] = $station;
 } else {
@@ -60,9 +60,17 @@ $sql = "
     LIMIT 100
 ";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-echo json_encode($results);
+    echo json_encode($results);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Database error',
+        'details' => $e->getMessage()
+    ]);
+}
 
