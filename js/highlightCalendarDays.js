@@ -1,35 +1,41 @@
 // File: /dashboard/js/highlightCalendarDays.js
 
 /**
- * Fetches and highlights calendar days for a given species.
- * @param {string} speciesCode - The code of the species to highlight.
+ * Fetches and highlights calendar days for a given species + year.
+ * Expects DOM ids like: day-YYYY-month-dd (e.g., day-2025-january-06)
+ *
+ * @param {string} speciesCode
+ * @param {{ year?: number }} opts
  */
-export async function highlightCalendarDays(speciesCode) {
+export async function highlightCalendarDays(speciesCode, opts = {}) {
   if (!speciesCode) {
     console.warn("highlightCalendarDays: no speciesCode provided");
     return;
   }
 
+  const year = Number.isFinite(opts.year) ? opts.year : 2025;
+
   try {
-    // ✅ Correct path on the live server
     const res = await fetch(
-      `/dashboard/php/get_highlight_days.php?species_code=${speciesCode}`
+      `/dashboard/php/get_highlight_days.php?species_code=${encodeURIComponent(
+        speciesCode
+      )}&year=${encodeURIComponent(year)}`
     );
+
     if (!res.ok) {
       throw new Error(`get_highlight_days.php returned HTTP ${res.status}`);
     }
 
     const json = await res.json();
-    console.log("🐦 Highlight API response:", json);
+    console.log(`🐦 Highlight API response (${year}):`, json);
 
-    // If PHP returns { species_code, result }, use .result; otherwise use payload directly
     const data = json.result ?? json;
 
-    // Flip each matching day cell to black/white
     for (const [month, days] of Object.entries(data)) {
       if (!Array.isArray(days)) continue;
+
       for (const day of days) {
-        const id = `day-${month.toLowerCase()}-${String(day).padStart(2, "0")}`;
+        const id = `day-${year}-${month.toLowerCase()}-${String(day).padStart(2, "0")}`;
         const el = document.getElementById(id);
         if (el) {
           el.classList.remove("hover:bg-gray-200");
