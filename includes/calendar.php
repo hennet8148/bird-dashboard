@@ -44,46 +44,53 @@ function monthSlug(string $name): string {
 }
 ?>
 
-<div id="birdCalendar"
-     data-calendar-year="<?= htmlspecialchars((string)$calendarYear, ENT_QUOTES) ?>"
-     class="inline-grid grid-cols-4 gap-0 text-[8px] leading-tight text-center">
+<div class="w-full">
+  <!-- Year label -->
+  <div class="text-sm font-semibold text-gray-700 mb-2 text-center">
+    <?= htmlspecialchars((string)$calendarYear, ENT_QUOTES) ?>
+  </div>
 
-  <?php foreach ($months as $monthNum => $meta): ?>
-    <?php
-      $monthName = $meta[0];
-      $daysInMonth = (int)$meta[1];
-      $startDow = monthStartDow((int)$calendarYear, (int)$monthNum);
-      $slug = monthSlug($monthName);
-    ?>
+  <div id="birdCalendar"
+       data-calendar-year="<?= htmlspecialchars((string)$calendarYear, ENT_QUOTES) ?>"
+       class="inline-grid grid-cols-4 gap-0 text-[8px] leading-tight text-center">
 
-    <div class="border rounded bg-gray-50 p-0 w-[96px]">
-      <h3 class="text-xs font-semibold bg-gray-200 rounded px-0 py-0 mb-0">
-        <?= htmlspecialchars($monthName, ENT_QUOTES) ?>
-      </h3>
+    <?php foreach ($months as $monthNum => $meta): ?>
+      <?php
+        $monthName = $meta[0];
+        $daysInMonth = (int)$meta[1];
+        $startDow = monthStartDow((int)$calendarYear, (int)$monthNum);
+        $slug = monthSlug($monthName);
+      ?>
 
-      <div class="grid grid-cols-7 gap-0">
-        <?php
-          // Weekday headers
-          foreach (['Su','Mo','Tu','We','Th','Fr','Sa'] as $wd) {
-            echo "<div class='font-bold text-gray-500'>{$wd}</div>";
-          }
+      <div class="border rounded bg-gray-50 p-0 w-[96px]">
+        <h3 class="text-xs font-semibold bg-gray-200 rounded px-0 py-0 mb-0">
+          <?= htmlspecialchars($monthName, ENT_QUOTES) ?>
+        </h3>
 
-          // Leading blanks
-          for ($i = 0; $i < $startDow; $i++) {
-            echo "<div class='w-4 h-4'></div>";
-          }
+        <div class="grid grid-cols-7 gap-0">
+          <?php
+            // Weekday headers
+            foreach (['Su','Mo','Tu','We','Th','Fr','Sa'] as $wd) {
+              echo "<div class='font-bold text-gray-500'>{$wd}</div>";
+            }
 
-          // Days
-          for ($d = 1; $d <= $daysInMonth; $d++) {
-            $dayStr = str_pad((string)$d, 2, '0', STR_PAD_LEFT);
-            $id = "day-{$calendarYear}-{$slug}-{$dayStr}";
-            echo "<div id='{$id}' class='w-4 h-4 flex items-center justify-center rounded hover:bg-gray-200'>{$d}</div>";
-          }
-        ?>
+            // Leading blanks
+            for ($i = 0; $i < $startDow; $i++) {
+              echo "<div class='w-4 h-4'></div>";
+            }
+
+            // Days
+            for ($d = 1; $d <= $daysInMonth; $d++) {
+              $dayStr = str_pad((string)$d, 2, '0', STR_PAD_LEFT);
+              $id = "day-{$calendarYear}-{$slug}-{$dayStr}";
+              echo "<div id='{$id}' class='w-4 h-4 flex items-center justify-center rounded hover:bg-gray-200'>{$d}</div>";
+            }
+          ?>
+        </div>
       </div>
-    </div>
-  <?php endforeach; ?>
+    <?php endforeach; ?>
 
+  </div>
 </div>
 
 <script type="module">
@@ -96,3 +103,4 @@ function monthSlug(string $name): string {
     highlightCalendarDays(window.speciesCode, { year });
   }
 </script>
+
