@@ -39,14 +39,18 @@ if ($isLeap) {
 }
 
 // Helper: compute start day (0=Su..6=Sa) for a given month/year
-function monthStartDow(int $year, int $month): int {
-  $dt = new DateTime(sprintf('%04d-%02d-01', $year, $month));
-  return (int)$dt->format('w');
+if (!function_exists('monthStartDow')) {
+  function monthStartDow(int $year, int $month): int {
+    $dt = new DateTime(sprintf('%04d-%02d-01', $year, $month));
+    return (int)$dt->format('w');
+  }
 }
 
 // Helper: month name slug used in IDs (lowercase)
-function monthSlug(string $name): string {
-  return strtolower($name);
+if (!function_exists('monthSlug')) {
+  function monthSlug(string $name): string {
+    return strtolower($name);
+  }
 }
 
 $calendarDomId = "birdCalendar-" . $calendarYear;
@@ -77,14 +81,17 @@ $calendarDomId = "birdCalendar-" . $calendarYear;
 
         <div class="grid grid-cols-7 gap-0">
           <?php
+            // Weekday headers
             foreach (['Su','Mo','Tu','We','Th','Fr','Sa'] as $wd) {
               echo "<div class='font-bold text-gray-500'>{$wd}</div>";
             }
 
+            // Leading blanks
             for ($i = 0; $i < $startDow; $i++) {
               echo "<div class='w-4 h-4'></div>";
             }
 
+            // Days
             for ($d = 1; $d <= $daysInMonth; $d++) {
               $dayStr = str_pad((string)$d, 2, '0', STR_PAD_LEFT);
               $id = "day-{$calendarYear}-{$slug}-{$dayStr}";
@@ -101,7 +108,7 @@ $calendarDomId = "birdCalendar-" . $calendarYear;
 <script type="module">
   import { highlightCalendarDays } from '/dashboard/js/highlightCalendarDays.js';
 
-  const cal = document.getElementById('<?= $calendarDomId ?>');
+  const cal = document.getElementById('<?= htmlspecialchars($calendarDomId, ENT_QUOTES) ?>');
   const year = cal?.dataset?.calendarYear ? parseInt(cal.dataset.calendarYear, 10) : <?= (int)$calendarYear ?>;
 
   if (window.speciesCode) {
