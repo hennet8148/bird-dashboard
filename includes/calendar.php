@@ -4,10 +4,17 @@
  *
  * - Computes month start weekday dynamically (no hardcoded offsets)
  * - Uses year-scoped day IDs: day-YYYY-month-dd (e.g., day-2025-january-06)
- * - Exposes year in data-calendar-year for JS highlighting
+ * - Calls highlightCalendarDays(speciesCode, { year }) for this calendar
+ *
+ * Usage:
+ *   $calendarYear = 2025; include __DIR__ . '/calendar.php';
+ *   $calendarYear = 2026; include __DIR__ . '/calendar.php';
  */
 
-$calendarYear = 2025;
+if (!isset($calendarYear) || !is_numeric($calendarYear)) {
+  $calendarYear = 2025;
+}
+$calendarYear = (int)$calendarYear;
 
 // Month meta: month number => [name, days]
 $months = [
@@ -26,14 +33,13 @@ $months = [
 ];
 
 // Leap year adjustment
-$isLeap = ((int)$calendarYear % 4 === 0 && ((int)$calendarYear % 100 !== 0 || (int)$calendarYear % 400 === 0));
+$isLeap = ($calendarYear % 4 === 0 && ($calendarYear % 100 !== 0 || $calendarYear % 400 === 0));
 if ($isLeap) {
   $months[2][1] = 29;
 }
 
 // Helper: compute start day (0=Su..6=Sa) for a given month/year
 function monthStartDow(int $year, int $month): int {
-  // PHP 'w' => 0 (Sunday) through 6 (Saturday)
   $dt = new DateTime(sprintf('%04d-%02d-01', $year, $month));
   return (int)$dt->format('w');
 }
@@ -42,6 +48,8 @@ function monthStartDow(int $year, int $month): int {
 function monthSlug(string $name): string {
   return strtolower($name);
 }
+
+$calendarDomId = "birdCalendar-" . $calendarYear;
 ?>
 
 <div class="w-full">
@@ -50,7 +58,7 @@ function monthSlug(string $name): string {
     <?= htmlspecialchars((string)$calendarYear, ENT_QUOTES) ?>
   </div>
 
-  <div id="birdCalendar"
+  <div id="<?= htmlspecialchars($calendarDomId, ENT_QUOTES) ?>"
        data-calendar-year="<?= htmlspecialchars((string)$calendarYear, ENT_QUOTES) ?>"
        class="inline-grid grid-cols-4 gap-0 text-[8px] leading-tight text-center">
 
@@ -58,7 +66,7 @@ function monthSlug(string $name): string {
       <?php
         $monthName = $meta[0];
         $daysInMonth = (int)$meta[1];
-        $startDow = monthStartDow((int)$calendarYear, (int)$monthNum);
+        $startDow = monthStartDow($calendarYear, (int)$monthNum);
         $slug = monthSlug($monthName);
       ?>
 
@@ -69,17 +77,14 @@ function monthSlug(string $name): string {
 
         <div class="grid grid-cols-7 gap-0">
           <?php
-            // Weekday headers
             foreach (['Su','Mo','Tu','We','Th','Fr','Sa'] as $wd) {
               echo "<div class='font-bold text-gray-500'>{$wd}</div>";
             }
 
-            // Leading blanks
             for ($i = 0; $i < $startDow; $i++) {
               echo "<div class='w-4 h-4'></div>";
             }
 
-            // Days
             for ($d = 1; $d <= $daysInMonth; $d++) {
               $dayStr = str_pad((string)$d, 2, '0', STR_PAD_LEFT);
               $id = "day-{$calendarYear}-{$slug}-{$dayStr}";
@@ -96,8 +101,8 @@ function monthSlug(string $name): string {
 <script type="module">
   import { highlightCalendarDays } from '/dashboard/js/highlightCalendarDays.js';
 
-  const cal = document.getElementById('birdCalendar');
-  const year = cal?.dataset?.calendarYear ? parseInt(cal.dataset.calendarYear, 10) : 2025;
+  const cal = document.getElementById('<?= $calendarDomId ?>');
+  const year = cal?.dataset?.calendarYear ? parseInt(cal.dataset.calendarYear, 10) : <?= (int)$calendarYear ?>;
 
   if (window.speciesCode) {
     highlightCalendarDays(window.speciesCode, { year });

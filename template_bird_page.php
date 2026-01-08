@@ -14,7 +14,6 @@
 
 <div class="max-w-5xl mx-auto p-6">
 
-
   <h1 class="text-3xl font-serif mt-2 mb-1"><?php echo $species_common_name; ?></h1>
   <p class="text-gray-600 italic text-lg mb-4"><?php echo $scientific_name; ?></p>
 
@@ -34,13 +33,28 @@
   <!-- Calendar block -->
   <div class="border-t pt-6 mt-6 flex justify-center">
     <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
-      <div class="w-[412px]">
+      <div class="w-[860px]">
         <p class="text-sm mb-3 text-gray-700 text-center">
-          This calendar shows the days that <strong><?php echo $species_common_name; ?></strong> was detected with confidence <strong>0.50 or greater</strong>.
+          These calendars show the days that <strong><?php echo $species_common_name; ?></strong> was detected with confidence <strong>0.50 or greater</strong>.
           Detections began June 24, 2025.
         </p>
-        <div id="speciesDashboard" class="text-xs">
-          <?php include __DIR__ . '/../includes/calendar.php'; ?>
+
+        <div id="speciesDashboard" class="text-xs flex gap-4 justify-center items-start">
+          <!-- 2025 calendar -->
+          <div class="w-[412px]">
+            <?php
+              $calendarYear = 2025;
+              include __DIR__ . '/../includes/calendar.php';
+            ?>
+          </div>
+
+          <!-- 2026 calendar -->
+          <div class="w-[412px]">
+            <?php
+              $calendarYear = 2026;
+              include __DIR__ . '/../includes/calendar.php';
+            ?>
+          </div>
         </div>
       </div>
     </div>
@@ -67,11 +81,11 @@
   </div>
 
   <!-- Footer links -->
-<div class="mt-12 text-sm text-center text-gray-500 border-t pt-6">
-  <p class="mb-2">Explore more:</p>
-  <a href="https://davidsonfarmbirdproject.org/data-explorer/" class="text-blue-600 hover:underline mx-2">Main Dashboard</a> |
-  <a href="/" class="text-blue-600 hover:underline mx-2">DFBP Home</a>
-</div>
+  <div class="mt-12 text-sm text-center text-gray-500 border-t pt-6">
+    <p class="mb-2">Explore more:</p>
+    <a href="https://davidsonfarmbirdproject.org/data-explorer/" class="text-blue-600 hover:underline mx-2">Main Dashboard</a> |
+    <a href="/" class="text-blue-600 hover:underline mx-2">DFBP Home</a>
+  </div>
 
 </div>
 
