@@ -1,0 +1,462 @@
+{
+  "get_sightings_by_timerange.php": [
+    {
+      "sql": "SELECT \n        sc.species_code,\n        s.species_common_name,\n        COUNT(*) AS sightings_count,\n        AVG(s.confidence) AS avg_confidence,\n        MAX(s.confidence) AS max_confidence\n    FROM sightings s\n    INNER JOIN species_codes sc\n        ON TRIM(LOWER(s.species_common_name)) = TRIM(LOWER(sc.species_common_name))\n    WHERE 1=1\n    1=1\n    GROUP BY s.species_common_name, sc.species_code\n    ORDER BY sightings_count DESC\n    LIMIT 100\n;",
+      "error": "1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1\n    GROUP BY s.species_common_name, sc.species_code\n    ORDER BY sightings_c' at line 11"
+    }
+  ],
+  "get_hourly_distribution.php": [
+    {
+      "sql": "SELECT HOUR(s.timestamp) AS hour, COUNT(*) AS count\n  FROM sightings s\n  JOIN species_codes sc ON s.species_common_name = sc.species_common_name\n  WHERE sc.species_code = 'TEST'\n    AND s.confidence >= 0.5\n  GROUP BY HOUR(s.timestamp)\n  ORDER BY hour\n;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "message": "no matching row in const table"
+        }
+      }
+    },
+    {
+      "sql": "SELECT COUNT(*) AS total, AVG(s.confidence) AS avg_conf, MAX(s.confidence) AS max_conf\n  FROM sightings s\n  JOIN species_codes sc ON s.species_common_name = sc.species_common_name\n  WHERE sc.species_code = 'TEST'\n    AND s.confidence >= 0.5\n;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "message": "no matching row in const table"
+        }
+      }
+    }
+  ],
+  "get_highlight_days.php": [
+    {
+      "sql": "SELECT DATE(s.timestamp) AS day\n  FROM sightings s\n  JOIN species_codes sc ON s.species_common_name = sc.species_common_name\n  WHERE sc.species_code = 'TEST'\n    AND s.confidence >= 0.5\n;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "message": "no matching row in const table"
+        }
+      }
+    }
+  ],
+  "get_sightings_by_bird.php": [
+    {
+      "sql": "SELECT timestamp, confidence\n    FROM sightings\n    WHERE species_common_name = 'Wood Thrush'\n      AND 1=1\n;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "53384.51"
+          },
+          "table": {
+            "table_name": "sightings",
+            "access_type": "ref",
+            "possible_keys": [
+              "idx_species_confidence"
+            ],
+            "key": "idx_species_confidence",
+            "used_key_parts": [
+              "species_common_name"
+            ],
+            "key_length": "1022",
+            "ref": [
+              "const"
+            ],
+            "rows_examined_per_scan": 291578,
+            "rows_produced_per_join": 291578,
+            "filtered": "100.00",
+            "cost_info": {
+              "read_cost": "24226.71",
+              "eval_cost": "29157.80",
+              "prefix_cost": "53384.51",
+              "data_read_per_join": "1G"
+            },
+            "used_columns": [
+              "timestamp",
+              "species_common_name",
+              "confidence"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "get_summary.php": [
+    {
+      "sql": "SELECT \n                COUNT(*) AS total_sightings,\n                COUNT(DISTINCT species_common_name) AS total_species\n            FROM sightings;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "116172.27"
+          },
+          "table": {
+            "table_name": "sightings",
+            "access_type": "index",
+            "key": "idx_species_confidence",
+            "used_key_parts": [
+              "species_common_name",
+              "confidence"
+            ],
+            "key_length": "1026",
+            "rows_examined_per_scan": 1080967,
+            "rows_produced_per_join": 1080967,
+            "filtered": "100.00",
+            "using_index": true,
+            "cost_info": {
+              "read_cost": "8075.57",
+              "eval_cost": "108096.70",
+              "prefix_cost": "116172.27",
+              "data_read_per_join": "5G"
+            },
+            "used_columns": [
+              "species_common_name"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "get_species_yesterday.php": [
+    {
+      "sql": "SELECT DISTINCT species_common_name\n        FROM sightings\n        WHERE confidence >= 0.5\n          AND DATE(timestamp) = CURDATE() - INTERVAL 1 DAY\n    ;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "116172.27"
+          },
+          "duplicates_removal": {
+            "using_filesort": false,
+            "table": {
+              "table_name": "sightings",
+              "access_type": "index",
+              "possible_keys": [
+                "idx_species_confidence"
+              ],
+              "key": "idx_species_confidence",
+              "used_key_parts": [
+                "species_common_name",
+                "confidence"
+              ],
+              "key_length": "1026",
+              "rows_examined_per_scan": 1080967,
+              "rows_produced_per_join": 360286,
+              "filtered": "33.33",
+              "cost_info": {
+                "read_cost": "80143.64",
+                "eval_cost": "36028.63",
+                "prefix_cost": "116172.27",
+                "data_read_per_join": "1G"
+              },
+              "used_columns": [
+                "id",
+                "timestamp",
+                "species_common_name",
+                "confidence"
+              ],
+              "attached_condition": "((`birdnet_db`.`sightings`.`confidence` >= 0.5) and (cast(`birdnet_db`.`sightings`.`timestamp` as date) = <cache>((curdate() - interval 1 day))))"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "get_unique_species.php": [
+    {
+      "sql": "SELECT DISTINCT species_common_name\n    FROM sightings\n   WHERE confidence >= 0.5\n;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "116172.27"
+          },
+          "duplicates_removal": {
+            "using_filesort": false,
+            "table": {
+              "table_name": "sightings",
+              "access_type": "index",
+              "possible_keys": [
+                "idx_species_confidence"
+              ],
+              "key": "idx_species_confidence",
+              "used_key_parts": [
+                "species_common_name",
+                "confidence"
+              ],
+              "key_length": "1026",
+              "rows_examined_per_scan": 1080967,
+              "rows_produced_per_join": 360286,
+              "filtered": "33.33",
+              "using_index": true,
+              "cost_info": {
+                "read_cost": "80143.64",
+                "eval_cost": "36028.63",
+                "prefix_cost": "116172.27",
+                "data_read_per_join": "1G"
+              },
+              "used_columns": [
+                "id",
+                "species_common_name",
+                "confidence"
+              ],
+              "attached_condition": "(`birdnet_db`.`sightings`.`confidence` >= 0.5)"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "weather.php": [
+    {
+      "sql": "SELECT *\n        FROM weather_readings\n        ORDER BY timestamp DESC\n        LIMIT 1\n    \");",
+      "error": "1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\")' at line 5"
+    }
+  ],
+  "stats.php": [
+    {
+      "sql": "SELECT COUNT(*) FROM sightings WHERE 1=1 1=1\")",
+      "error": "1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1\")' at line 1"
+    },
+    {
+      "sql": "SELECT COUNT(DISTINCT species_common_name) FROM sightings WHERE 1=1 1=1\")",
+      "error": "1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1\")' at line 1"
+    },
+    {
+      "sql": "SELECT MAX(timestamp) FROM sightings WHERE timestamp IS NOT NULL 1=1\");",
+      "error": "1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1\")' at line 1"
+    },
+    {
+      "sql": "SELECT start_date FROM station_codes WHERE station_id = 'S1'\");",
+      "error": "1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\")' at line 1"
+    },
+    {
+      "sql": "SELECT COUNT(DISTINCT species_common_name)\n            FROM sightings\n            WHERE confidence >= 0.5\n              AND DATE(timestamp) = '2025-09-20'\n              1=1\n        ;",
+      "error": "1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1' at line 5"
+    }
+  ],
+  "get_species_data.php": [
+    {
+      "sql": "SELECT timestamp, confidence\n        FROM sightings\n        WHERE species_common_name = 'Wood Thrush'\n    ;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "53384.51"
+          },
+          "table": {
+            "table_name": "sightings",
+            "access_type": "ref",
+            "possible_keys": [
+              "idx_species_confidence"
+            ],
+            "key": "idx_species_confidence",
+            "used_key_parts": [
+              "species_common_name"
+            ],
+            "key_length": "1022",
+            "ref": [
+              "const"
+            ],
+            "rows_examined_per_scan": 291578,
+            "rows_produced_per_join": 291578,
+            "filtered": "100.00",
+            "cost_info": {
+              "read_cost": "24226.71",
+              "eval_cost": "29157.80",
+              "prefix_cost": "53384.51",
+              "data_read_per_join": "1G"
+            },
+            "used_columns": [
+              "timestamp",
+              "species_common_name",
+              "confidence"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "get_yesterday_species.php": [
+    {
+      "sql": "SELECT COUNT(DISTINCT species_common_name) AS count\n  FROM sightings\n  WHERE confidence >= 0.5\n    AND DATE(timestamp) = '2025-09-20'\n;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "116172.27"
+          },
+          "table": {
+            "table_name": "sightings",
+            "access_type": "ALL",
+            "possible_keys": [
+              "idx_species_confidence"
+            ],
+            "rows_examined_per_scan": 1080967,
+            "rows_produced_per_join": 360286,
+            "filtered": "33.33",
+            "cost_info": {
+              "read_cost": "80143.64",
+              "eval_cost": "36028.63",
+              "prefix_cost": "116172.27",
+              "data_read_per_join": "1G"
+            },
+            "used_columns": [
+              "timestamp",
+              "species_common_name",
+              "confidence"
+            ],
+            "attached_condition": "((`birdnet_db`.`sightings`.`confidence` >= 0.5) and (cast(`birdnet_db`.`sightings`.`timestamp` as date) = '2025-09-20'))"
+          }
+        }
+      }
+    },
+    {
+      "sql": "SELECT DISTINCT species_common_name\n  FROM sightings\n  WHERE confidence >= 0.5\n    AND DATE(timestamp) = '2025-09-20'\n  ORDER BY species_common_name ASC\n;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "116172.27"
+          },
+          "ordering_operation": {
+            "using_filesort": false,
+            "duplicates_removal": {
+              "using_filesort": false,
+              "table": {
+                "table_name": "sightings",
+                "access_type": "index",
+                "possible_keys": [
+                  "idx_species_confidence"
+                ],
+                "key": "idx_species_confidence",
+                "used_key_parts": [
+                  "species_common_name",
+                  "confidence"
+                ],
+                "key_length": "1026",
+                "rows_examined_per_scan": 1080967,
+                "rows_produced_per_join": 360286,
+                "filtered": "33.33",
+                "cost_info": {
+                  "read_cost": "80143.64",
+                  "eval_cost": "36028.63",
+                  "prefix_cost": "116172.27",
+                  "data_read_per_join": "1G"
+                },
+                "used_columns": [
+                  "id",
+                  "timestamp",
+                  "species_common_name",
+                  "confidence"
+                ],
+                "attached_condition": "((`birdnet_db`.`sightings`.`confidence` >= 0.5) and (cast(`birdnet_db`.`sightings`.`timestamp` as date) = '2025-09-20'))"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "get_species_by_confidence.php": [
+    {
+      "sql": "SELECT DISTINCT species_common_name \n        FROM sightings \n        WHERE confidence >= 0.5\n    ;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "116172.27"
+          },
+          "duplicates_removal": {
+            "using_filesort": false,
+            "table": {
+              "table_name": "sightings",
+              "access_type": "index",
+              "possible_keys": [
+                "idx_species_confidence"
+              ],
+              "key": "idx_species_confidence",
+              "used_key_parts": [
+                "species_common_name",
+                "confidence"
+              ],
+              "key_length": "1026",
+              "rows_examined_per_scan": 1080967,
+              "rows_produced_per_join": 360286,
+              "filtered": "33.33",
+              "using_index": true,
+              "cost_info": {
+                "read_cost": "80143.64",
+                "eval_cost": "36028.63",
+                "prefix_cost": "116172.27",
+                "data_read_per_join": "1G"
+              },
+              "used_columns": [
+                "id",
+                "species_common_name",
+                "confidence"
+              ],
+              "attached_condition": "(`birdnet_db`.`sightings`.`confidence` >= 0.5)"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "species_list.php": [
+    {
+      "sql": "SELECT DISTINCT species_common_name FROM sightings;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "cost_info": {
+            "query_cost": "219.83"
+          },
+          "duplicates_removal": {
+            "using_filesort": false,
+            "table": {
+              "table_name": "sightings",
+              "access_type": "range",
+              "possible_keys": [
+                "idx_species_confidence"
+              ],
+              "key": "idx_species_confidence",
+              "used_key_parts": [
+                "species_common_name"
+              ],
+              "key_length": "1022",
+              "rows_examined_per_scan": 155,
+              "rows_produced_per_join": 155,
+              "filtered": "100.00",
+              "using_index_for_group_by": true,
+              "cost_info": {
+                "read_cost": "204.34",
+                "eval_cost": "15.50",
+                "prefix_cost": "219.84",
+                "data_read_per_join": "830K"
+              },
+              "used_columns": [
+                "id",
+                "species_common_name"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "test_db.php": [
+    {
+      "sql": "SELECT COUNT(*) AS count FROM sightings\");",
+      "error": "1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\")' at line 1"
+    }
+  ],
+  "get_species_timeseries.php": [
+    {
+      "sql": "SELECT \n    DATE(s.`timestamp`) AS `date`,\n    s.`location`        AS `station`,\n    COUNT(*)            AS `count`\n  FROM `sightings` s\n  JOIN `species_codes` sc \n    ON s.`species_common_name` = sc.`species_common_name`\n  WHERE sc.`species_code` = 'TEST'\n  GROUP BY DATE(s.`timestamp`), s.`location`\n  ORDER BY DATE(s.`timestamp`)\n;",
+      "explain": {
+        "query_block": {
+          "select_id": 1,
+          "message": "no matching row in const table"
+        }
+      }
+    }
+  ]
+}

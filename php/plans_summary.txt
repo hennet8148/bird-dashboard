@@ -1,0 +1,53 @@
+
+### get_sightings_by_timerange.php
+  Query 1: ERROR -> 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1
+    GROUP BY s.species_common_name, sc.species_code
+    ORDER BY sightings_c' at line 11
+
+### get_hourly_distribution.php
+  Query 1: Could not parse plan
+  Query 2: Could not parse plan
+
+### get_highlight_days.php
+  Query 1: Could not parse plan
+
+### get_sightings_by_bird.php
+  Query 1: table=sightings, access=ref, rows=291578, index=idx_species_confidence Using index idx_species_confidence
+
+### get_summary.php
+  Query 1: table=sightings, access=index, rows=1080967, index=idx_species_confidence Using index idx_species_confidence
+
+### get_species_yesterday.php
+  Query 1: table=sightings, access=index, rows=1080967, index=idx_species_confidence ⚠️ Using function on column (not index-friendly); Using index idx_species_confidence
+
+### get_unique_species.php
+  Query 1: table=sightings, access=index, rows=1080967, index=idx_species_confidence Using index idx_species_confidence
+
+### weather.php
+  Query 1: ERROR -> 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '")' at line 5
+
+### stats.php
+  Query 1: ERROR -> 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1")' at line 1
+  Query 2: ERROR -> 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1")' at line 1
+  Query 3: ERROR -> 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1")' at line 1
+  Query 4: ERROR -> 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '")' at line 1
+  Query 5: ERROR -> 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '1=1' at line 5
+
+### get_species_data.php
+  Query 1: table=sightings, access=ref, rows=291578, index=idx_species_confidence Using index idx_species_confidence
+
+### get_yesterday_species.php
+  Query 1: table=sightings, access=ALL, rows=1080967, index=NONE ⚠️ Full table scan; ⚠️ Using function on column (not index-friendly)
+  Query 2: table=sightings, access=index, rows=1080967, index=idx_species_confidence ⚠️ Using function on column (not index-friendly); Using index idx_species_confidence
+
+### get_species_by_confidence.php
+  Query 1: table=sightings, access=index, rows=1080967, index=idx_species_confidence Using index idx_species_confidence
+
+### species_list.php
+  Query 1: table=sightings, access=range, rows=155, index=idx_species_confidence Using index idx_species_confidence
+
+### test_db.php
+  Query 1: ERROR -> 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '")' at line 1
+
+### get_species_timeseries.php
+  Query 1: Could not parse plan
