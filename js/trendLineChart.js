@@ -13,18 +13,31 @@ export async function renderSpeciesTrendCharts(speciesCode) {
     const data = await res.json();
     if (!Array.isArray(data) || !data.length) return;
 
+    const year1Start = new Date("2025-06-24T00:00:00");
+    const year1End   = new Date("2026-06-23T23:59:59");
+
+    const year2Start = new Date("2026-06-24T00:00:00");
+    const year2End   = new Date("2027-06-23T23:59:59");
+
+    const year1Data = filterByDateRange(data, year1Start, year1End);
+    const year2Data = filterByDateRange(data, year2Start, year2End);
+
+    const sharedScale = calculateScale([...year1Data, ...year2Data]);
+
     renderChart(
       "speciesTrendChartYear1",
-      data,
-      new Date("2025-06-24T00:00:00"),
-      new Date("2026-06-23T23:59:59")
+      year1Data,
+      year1Start,
+      year1End,
+      sharedScale
     );
 
     renderChart(
       "speciesTrendChartYear2",
-      data,
-      new Date("2026-06-24T00:00:00"),
-      new Date("2027-06-23T23:59:59")
+      year2Data,
+      year2Start,
+      year2End,
+      sharedScale
     );
 
   } catch (err) {
@@ -32,12 +45,45 @@ export async function renderSpeciesTrendCharts(speciesCode) {
   }
 }
 
-function renderChart(canvasId, data, startDate, endDate) {
-
-  const filtered = data.filter(row => {
+function filterByDateRange(data, startDate, endDate) {
+  return data.filter(row => {
     const d = new Date(row.date + "T12:00:00");
     return d >= startDate && d <= endDate;
   });
+}
+
+function totalForRow(row) {
+  return (
+    Number(row.S1 ?? 0) +
+    Number(row.S2 ?? 0) +
+    Number(row.S3 ?? 0)
+  );
+}
+
+function calculateScale(data) {
+  const totals = data.map(totalForRow);
+  const maxTotal = Math.max(...totals, 1);
+
+  const magnitude = Math.pow(
+    10,
+    Math.floor(Math.log10(maxTotal))
+  );
+
+  const stepCount = 5;
+
+  const stepSize =
+    Math.ceil((maxTotal / stepCount) / magnitude) * magnitude;
+
+  const suggestedMax =
+    Math.ceil(maxTotal / stepSize) * stepSize;
+
+  return {
+    suggestedMax,
+    stepSize
+  };
+}
+
+function renderChart(canvasId, filtered, startDate, endDate, scale) {
 
   const s1Points = filtered.map(e => ({
     x: new Date(e.date + "T12:00:00"),
@@ -53,27 +99,6 @@ function renderChart(canvasId, data, startDate, endDate) {
     x: new Date(e.date + "T12:00:00"),
     y: Number(e.S3 ?? 0)
   }));
-
-  const totals = filtered.map(e =>
-    Number(e.S1 ?? 0) +
-    Number(e.S2 ?? 0) +
-    Number(e.S3 ?? 0)
-  );
-
-  const maxTotal = Math.max(...totals, 1);
-
-  const magnitude = Math.pow(
-    10,
-    Math.floor(Math.log10(maxTotal))
-  );
-
-  const stepCount = 5;
-
-  const stepSize =
-    Math.ceil((maxTotal / stepCount) / magnitude) * magnitude;
-
-  const suggestedMax =
-    Math.ceil(maxTotal / stepSize) * stepSize;
 
   const ctx = document.getElementById(canvasId);
 
@@ -151,7 +176,7 @@ function renderChart(canvasId, data, startDate, endDate) {
         y: {
 
           beginAtZero: true,
-          suggestedMax,
+          suggestedMax: scale.suggestedMax,
           stacked: true,
 
           title: {
@@ -160,7 +185,7 @@ function renderChart(canvasId, data, startDate, endDate) {
           },
 
           ticks: {
-            stepSize
+            stepSize: scale.stepSize
           }
 
         }
