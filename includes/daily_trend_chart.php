@@ -1,6 +1,6 @@
 <!-- File: includes/daily_trend_chart.php -->
 
-<div class="w-full max-w-5xl mx-auto border border-gray-300 bg-gray-50 p-4 rounded-lg mt-6">
+<div class="w-full  mx-auto border border-gray-300 bg-gray-50 p-4 rounded-lg mt-6">
   <h2 class="text-sm font-semibold text-gray-800 mb-1 text-center">
     Daily Detection Trend — Year 1
   </h2>
@@ -17,7 +17,7 @@
   </div>
 </div>
 
-<div class="w-full max-w-5xl mx-auto border border-gray-300 bg-gray-50 p-4 rounded-lg mt-8">
+<div class="w-full  border border-gray-300 bg-gray-50 p-4 rounded-lg mt-8">
   <h2 class="text-sm font-semibold text-gray-800 mb-1 text-center">
     Daily Detection Trend — Year 2
   </h2>

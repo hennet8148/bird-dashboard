@@ -60,11 +60,10 @@
     </div>
   </div>
 
-  <!-- Daily detection trend chart block -->
-  <div class="mt-10 flex justify-center">
-    <?php include __DIR__ . '/../includes/daily_trend_chart.php'; ?>
-  </div>
-
+<!-- Daily detection trend chart block -->
+<div class="mt-10">
+  <?php include __DIR__ . '/../includes/daily_trend_chart.php'; ?>
+</div>
   <!-- Hourly detection widget block -->
   <div class="mt-10 flex justify-center">
     <div class="rounded-lg border border-gray-300 bg-gray-50 p-4">
